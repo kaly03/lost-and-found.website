@@ -1,0 +1,3911 @@
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Creekside's Lost and Found System - Help reunite lost items with their owners">
+    <title>KnightTrack - Creekside's Lost & Found</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23b72a2a'/%3E%3Ccircle cx='42' cy='42' r='18' fill='none' stroke='white' stroke-width='5'/%3E%3Cline x1='55' y1='55' x2='70' y2='70' stroke='white' stroke-width='5' stroke-linecap='round'/%3E%3Ctext x='42' y='48' font-family='Arial' font-size='20' font-weight='bold' fill='white' text-anchor='middle'%3E?%3C/text%3E%3C/svg%3E">
+    <style>
+        
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #b72a2a;
+            --primary-hover: #4c4c4d;
+            --primary-light: #dbeafe;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --danger-light: #fee2e2;
+            --warning: #f59e0b;
+            --purple: #9333ea;
+            --purple-light: #e9d5ff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f9f7f7 0%, #f7f8f9 100%);
+            background-attachment: fixed;
+            color: var(--gray-800);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Navigation */
+        nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-lg);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--primary);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+            
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .nav-btn {
+            padding: 0.75rem 1.25rem;
+            border: none;
+            border-radius: 0.75rem;
+            background: transparent;
+            color: var(--gray-700);
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-light);
+            transform: translateY(100%);
+            transition: transform 0.3s;
+            z-index: -1;
+        }
+
+        .nav-btn:hover::before {
+            transform: translateY(0);
+        }
+
+        .nav-btn:hover {
+            color: var(--primary);
+        }
+
+        .nav-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .nav-btn.active::before {
+            display: none;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: var(--primary);
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+        }
+
+        /* Main Container */
+        main {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            min-height: calc(100vh - 80px - 150px);
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, #000000 100%);
+            color: white;
+            text-align: center;
+            padding: 4rem 2rem;
+            border-radius: 1.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -5%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            font-weight: 900;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero p {
+            font-size: 1.4rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.95;
+        }
+
+        .hero-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.875rem 1.75rem;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-light);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: var(--danger-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--gray-700);
+            border: 2px solid var(--gray-300);
+        }
+
+        .btn-outline:hover {
+            background: var(--gray-100);
+            border-color: var(--gray-400);
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--gray-700);
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--gray-300);
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .required {
+            color: var(--danger);
+        }
+
+        .help-text {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+            margin-top: 0.25rem;
+        }
+
+        /* Grid Layouts */
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .grid-cols-1 {
+            grid-template-columns: 1fr;
+        }
+
+        .grid-cols-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        /* Feature Cards */
+        .feature-card {
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, white 0%, var(--gray-50) 100%);
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            border-color: var(--primary-light);
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-icon {
+            width: 5rem;
+            height: 5rem;
+            margin: 0 auto 1.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            box-shadow: var(--shadow-lg);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: rotate(360deg);
+        }
+
+        .feature-icon.blue { 
+            background: linear-gradient(135deg, var(--primary-light) 0%, #93c5fd 100%);
+        }
+        .feature-icon.green { 
+            background: linear-gradient(135deg, var(--success-light) 0%, #6ee7b7 100%);
+        }
+        .feature-icon.purple { 
+            background: linear-gradient(135deg, var(--purple-light) 0%, #d8b4fe 100%);
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .feature-card p {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Items Grid */
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .item-card {
+            position: relative;
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+        }
+
+        .item-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .item-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .item-card:hover .item-image {
+            transform: scale(1.1);
+        }
+
+        .item-image-wrapper {
+            overflow: hidden;
+            background: var(--gray-100);
+        }
+
+        .item-content {
+            padding: 1.5rem;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+            gap: 0.5rem;
+        }
+
+        .item-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            line-height: 1.3;
+        }
+
+        .item-category {
+            background: linear-gradient(135deg, var(--primary-light) 0%, #93c5fd 100%);
+            color: var(--primary);
+            padding: 0.4rem 0.875rem;
+            border-radius: 2rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            white-space: nowrap;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .item-description {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+            margin-bottom: 1.25rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.6;
+        }
+
+        .item-details {
+            border-top: 2px solid var(--gray-100);
+            padding-top: 1rem;
+            margin-bottom: 1.25rem;
+            font-size: 0.9rem;
+            color: var(--gray-600);
+        }
+
+        .item-details p {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .item-details strong {
+            color: var(--gray-800);
+            font-weight: 600;
+        }
+
+        /* Search Bar */
+        .search-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .search-wrapper {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+            font-size: 1.25rem;
+        }
+
+        .search-input {
+            padding-left: 3rem;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 1000;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: white;
+            border-radius: 1.5rem;
+            max-width: 48rem;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: 2px solid var(--gray-100);
+            background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+        }
+
+        .modal-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--gray-900);
+        }
+
+        .modal-close {
+            background: var(--gray-100);
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-600);
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: var(--danger);
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        /* Admin Dashboard */
+        .admin-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #1e40af 100%);
+            color: white;
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .admin-header::before {
+            content: '🛡️';
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            font-size: 15rem;
+            opacity: 0.1;
+        }
+
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 900;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            font-weight: 600;
+        }
+
+        /* Info Banner */
+        .info-banner {
+            background: linear-gradient(135deg, var(--primary-light) 0%, #93c5fd 100%);
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            margin: 2rem 0;
+            box-shadow: var(--shadow);
+        }
+
+        .info-banner h3 {
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: #1e40af;
+            font-size: 1.125rem;
+        }
+
+        .info-banner ol {
+            padding-left: 1.75rem;
+            color: #1e3a8a;
+        }
+
+        .info-banner li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        /* Recent Items List */
+        .recent-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .recent-item:hover {
+            background: white;
+            border-color: var(--primary-light);
+            transform: translateX(8px);
+            box-shadow: var(--shadow);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--gray-500);
+        }
+
+        .empty-icon {
+            font-size: 5rem;
+            opacity: 0.4;
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .badge-warning {
+            background: #fef3c7;
+            color: var(--warning);
+        }
+
+        /* Footer */
+        /* Footer - Minimal base styles (detailed styles inline) */
+        footer {
+            margin-top: auto;
+        }
+
+        footer p {
+            margin: 0;
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-4 { margin-bottom: 2rem; }
+        .mt-2 { margin-top: 1rem; }
+
+        .flex {
+            display: flex;
+        }
+
+        .flex-wrap {
+            flex-wrap: wrap;
+        }
+
+        .gap-1 {
+            gap: 0.5rem;
+        }
+
+        .gap-2 {
+            gap: 1rem;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        /* Statistics Highlight Card */
+        .stats-highlight {
+            background: linear-gradient(135deg, var(--primary) 0%, #1e40af 100%);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow-xl);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-highlight::before {
+            content: '🎉';
+            position: absolute;
+            font-size: 10rem;
+            opacity: 0.1;
+            top: -2rem;
+            right: -2rem;
+        }
+
+        .stats-number {
+            font-size: 4rem;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .stats-label {
+            font-size: 1.25rem;
+            opacity: 0.95;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Character Counter */
+        .char-counter {
+            text-align: right;
+            font-size: 0.875rem;
+            color: var(--gray-500);
+            margin-top: 0.25rem;
+        }
+
+        .char-counter.warning {
+            color: var(--warning);
+            font-weight: 600;
+        }
+
+        .char-counter.danger {
+            color: var(--danger);
+            font-weight: 700;
+        }
+
+        /* Image preview container */
+        .item-image-wrapper {
+            overflow: hidden;
+            background: var(--gray-100);
+        }
+
+        /* Interactive Map Styles */
+        .map-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            margin: 2rem auto;
+            border: 4px solid var(--primary);
+            border-radius: 1rem;
+            overflow: hidden;
+            background: var(--gray-100);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .map-image {
+            width: 100%;
+            display: block;
+            user-select: none;
+        }
+
+        .map-pin {
+            position: absolute;
+            cursor: pointer;
+            font-size: 28px;
+            transform: translate(-50%, -100%);
+            transition: all 0.3s;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+            z-index: 10;
+        }
+
+        .map-pin:hover {
+            transform: translate(-50%, -100%) scale(1.4);
+            filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.5));
+        }
+
+        .map-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #8b1a1a 100%);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        /* Claim Status Badges */
+        .claim-status-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+            border: 2px solid #fbbf24;
+        }
+
+        .status-approved {
+            background: var(--success-light);
+            color: #065f46;
+            border: 2px solid var(--success);
+        }
+
+        .status-rejected {
+            background: var(--danger-light);
+            color: #991b1b;
+            border: 2px solid var(--danger);
+        }
+
+        /* Item Status Timeline */
+        .status-timeline {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+            border-radius: 1rem;
+            position: relative;
+        }
+
+        .timeline-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .timeline-step-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+            border: 3px solid var(--gray-300);
+            background: white;
+        }
+
+        .timeline-step.active .timeline-step-icon {
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-light);
+            transform: scale(1.1);
+        }
+
+        .timeline-step.completed .timeline-step-icon {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .timeline-step-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-600);
+        }
+
+        .timeline-step.active .timeline-step-label,
+        .timeline-step.completed .timeline-step-label {
+            color: var(--gray-900);
+        }
+
+        .timeline-line {
+            position: absolute;
+            top: 25px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gray-300);
+            z-index: 0;
+        }
+
+        .timeline-line-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: var(--success);
+            transition: width 0.5s;
+        }
+
+        /* Claims Table */
+        .claims-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+            background: white;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .claims-table th {
+            background: linear-gradient(135deg, var(--primary) 0%, #8b1a1a 100%);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 700;
+        }
+
+        .claims-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .claims-table tr:hover {
+            background: var(--gray-50);
+        }
+
+        .claims-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            /* Mobile-optimized buttons - 48px minimum touch target */
+            .btn {
+                min-height: 48px;
+                padding: 1rem 1.5rem;
+                font-size: 1rem;
+            }
+
+            .nav-btn {
+                min-height: 48px;
+                padding: 0.875rem 1.25rem;
+            }
+
+            .form-input,
+            .form-select,
+            .form-textarea {
+                min-height: 48px;
+                font-size: 1rem;
+                padding: 0.875rem 1rem;
+            }
+
+            /* Toast adjustments for mobile */
+            .toast {
+                min-width: auto;
+                max-width: calc(100vw - 40px);
+            }
+
+            .toast-container {
+                right: 10px;
+                left: 10px;
+            }
+
+            /* Stats adjustments for mobile */
+            .stats-number {
+                font-size: 3rem;
+            }
+
+            .stats-label {
+                font-size: 1.125rem;
+            }
+
+            .nav-links {
+                display: none !important;
+            }
+
+            .mobile-menu-btn {
+                display: block !important;
+            }
+
+            .mobile-menu {
+                display: none;
+                flex-direction: column;
+                gap: 0.5rem;
+                padding: 1rem;
+                border-top: 2px solid var(--gray-200);
+                background: white;
+            }
+
+            .mobile-menu.active {
+                display: flex !important;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1.125rem;
+            }
+
+            .grid-cols-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .items-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-container {
+                flex-direction: column;
+            }
+
+            .logo span:last-child {
+                display: none;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .nav-links {
+                display: flex !important;
+            }
+
+            .mobile-menu-btn {
+                display: none !important;
+            }
+
+            .mobile-menu {
+                display: none !important;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .grid-cols-3 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 4px solid var(--gray-200);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 3rem auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Image upload preview */
+        .image-preview-container {
+            position: relative;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+
+        .image-preview-container img {
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .remove-image-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s;
+        }
+
+        .remove-image-btn:hover {
+            transform: scale(1.1) rotate(90deg);
+            background: var(--danger-hover);
+        }
+
+        /* Admin Item Card */
+        .admin-item-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+            border-left: 4px solid var(--primary);
+        }
+
+        .admin-item-card:hover {
+            box-shadow: var(--shadow-xl);
+            transform: translateX(4px);
+        }
+
+        /* Claim Card */
+        .claim-card {
+            border-left: 4px solid var(--primary);
+            padding: 1.25rem;
+            background: linear-gradient(135deg, var(--primary-light) 0%, white 100%);
+            border-radius: 0 1rem 1rem 0;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow-xl);
+            border-left: 4px solid var(--primary);
+            min-width: 300px;
+            max-width: 400px;
+            pointer-events: auto;
+            animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .toast.success {
+            border-left-color: var(--success);
+        }
+
+        .toast.error {
+            border-left-color: var(--danger);
+        }
+
+        .toast.warning {
+            border-left-color: var(--warning);
+        }
+
+        .toast-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            color: var(--gray-900);
+        }
+
+        .toast-message {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--gray-400);
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .toast-close:hover {
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateX(400px);
+            }
+        }
+
+        /* Search Loading State */
+        .search-loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray-600);
+        }
+
+        .search-loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--gray-200);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Highlight animation for QR code item navigation */
+        @keyframes highlight {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+    </style>
+    
+    <!-- QR Code Generator Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <!-- Skip to main content for accessibility -->
+    <a href="#mainContent" style="position: absolute; left: -9999px; top: 0;">Skip to main content</a>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Navigation -->
+    <nav role="navigation" aria-label="Main navigation">
+        <div class="nav-container">
+            <div class="logo" onclick="app.navigate('home')" role="button" tabindex="0" aria-label="Go to home page">
+                <span class="logo-icon" aria-hidden="true">🏰</span>
+                <span>Creekside's Lost & Found</span>
+            </div>
+            
+            <!-- Desktop Navigation - Hidden on mobile -->
+            <div class="nav-links">
+                <button class="nav-btn active" data-page="home" onclick="app.navigate('home')" aria-label="Navigate to home page">
+                    🏠 Home
+                </button>
+                <button class="nav-btn" data-page="items" onclick="app.navigate('items')" aria-label="Navigate to search items page">
+                    🔍 Search
+                </button>
+                <button class="nav-btn" data-page="submit" onclick="app.navigate('submit')" aria-label="Navigate to report found item page">
+                    ➕ Report
+                </button>
+                <button class="nav-btn" data-page="my-claims" onclick="app.navigate('my-claims')" aria-label="Navigate to my claims page">
+                    📋 My Claims
+                </button>
+                <button class="nav-btn" data-page="admin" onclick="app.navigate('admin')" aria-label="Navigate to admin panel">
+                    🛡️ Admin
+                </button>
+            </div>
+            
+            <!-- Mobile Menu Button - Hidden on desktop -->
+            <button class="mobile-menu-btn" onclick="app.toggleMobileMenu()" aria-label="Toggle mobile menu" aria-expanded="false">
+                ☰
+            </button>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" id="mobileMenu" role="menu">
+            <button class="nav-btn" data-page="home" onclick="app.navigate('home')" role="menuitem">🏠 Home</button>
+            <button class="nav-btn" data-page="items" onclick="app.navigate('items')" role="menuitem">🔍 Search Items</button>
+            <button class="nav-btn" data-page="submit" onclick="app.navigate('submit')" role="menuitem">➕ Report Item</button>
+            <button class="nav-btn" data-page="my-claims" onclick="app.navigate('my-claims')" role="menuitem">📋 My Claims</button>
+            <button class="nav-btn" data-page="admin" onclick="app.navigate('admin')" role="menuitem">🛡️ Admin</button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="mainContent" role="main"></main>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" style="display: none;">
+        <div class="modal-overlay" onclick="app.cancelConfirm(event)">
+            <div class="modal" style="max-width: 32rem;">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="confirmTitle">Confirm Action</h2>
+                    <button class="modal-close" onclick="app.cancelConfirm()" aria-label="Close">×</button>
+                </div>
+                <div class="modal-body">
+                    <p id="confirmMessage" style="white-space: pre-line; line-height: 1.8; font-size: 1rem; color: var(--gray-700);"></p>
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                        <button class="btn btn-outline" onclick="app.cancelConfirm()" style="flex: 1;">
+                            Cancel
+                        </button>
+                        <button class="btn btn-danger" id="confirmOkBtn" onclick="app.confirmOk()" style="flex: 1;">
+                            Confirm
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div id="qrModal" style="display: none;">
+        <div class="modal-overlay" onclick="app.closeQRModal(event)">
+            <div class="modal" style="max-width: 32rem;">
+                <div class="modal-header">
+                    <h2 class="modal-title">📱 QR Code Poster</h2>
+                    <button class="modal-close" onclick="app.closeQRModal()" aria-label="Close">×</button>
+                </div>
+                <div class="modal-body" style="text-align: center;">
+                    <div id="qrCodeContainer" style="display: flex; justify-content: center; margin: 1.5rem 0;"></div>
+                    <div id="qrItemInfo" style="margin-bottom: 1.5rem;"></div>
+                    <div class="info-banner">
+                        <p style="font-size: 0.875rem; margin: 0;">
+                            💡 <strong>How to use:</strong> Right-click the QR code → Save image → Print poster → Post on bulletin board!
+                        </p>
+                    </div>
+                    <button class="btn btn-primary" onclick="app.downloadQRCode()" style="width: 100%; margin-top: 1rem;">
+                        📥 Download QR Code
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Notification Modal -->
+    <div id="emailModal" style="display: none;">
+        <div class="modal-overlay" onclick="app.closeEmailModal(event)">
+            <div class="modal" style="max-width: 42rem;">
+                <div class="modal-header">
+                    <h2 class="modal-title">📧 Email Notification Preview</h2>
+                    <button class="modal-close" onclick="app.closeEmailModal()" aria-label="Close">×</button>
+                </div>
+                <div class="modal-body">
+                    <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 1.5rem;">
+                        <div id="emailContent" style="font-family: Arial, sans-serif; line-height: 1.8; color: var(--gray-800);"></div>
+                    </div>
+                    
+                    <div class="info-banner" style="margin-bottom: 1rem;">
+                        <p style="font-size: 0.875rem; margin: 0;">
+                            💡 <strong>How to use:</strong> Copy the email text and send it to the student, or click "Open Email" to compose in your email app.
+                        </p>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                        <button class="btn btn-secondary" onclick="app.copyEmailText()" style="width: 100%;">
+                            📋 Copy to Clipboard
+                        </button>
+                        <button class="btn btn-primary" onclick="app.openEmailApp()" style="width: 100%;">
+                            📧 Open in Email App
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Footer -->
+    <footer role="contentinfo" style="border-top: 3px solid var(--primary);">
+        <div style="max-width: 1280px; margin: 0 auto; padding: 1.5rem 1rem; display: grid; grid-template-columns: 1fr auto; gap: 3rem; align-items: start;">
+            <!-- Left Side: School Information -->
+            <div style="font-size: 0.875rem; line-height: 1.8;">
+                <p style="font-weight: 700; color: var(--gray-800); margin-bottom: 0.25rem;">Creekside High School</p>
+                <p style="color: var(--gray-600); margin-bottom: 0.25rem;">100 Knights Ln, St. Johns, FL 32259</p>
+                <p style="margin-bottom: 0;">
+                    <a href="#" onclick="window.location.href='mai'+'lto:'+'office'+'@'+'creekside.edu'; return false;" 
+                       style="color: var(--primary); text-decoration: none; margin-right: 1rem; transition: color 0.3s ease;"
+                       onmouseover="this.style.color='var(--gray-600)'"
+                       onmouseout="this.style.color='var(--primary)'">
+                        office<span style="display:none">-remove-</span>@<span style="display:none">-this-</span>creekside.edu
+                    </a>
+                    <a href="tel:+19041234567" 
+                       style="color: var(--primary); text-decoration: none; transition: color 0.3s ease;"
+                       onmouseover="this.style.color='var(--gray-600)'"
+                       onmouseout="this.style.color='var(--primary)'">
+                        (904) 123-4567
+                    </a>
+                </p>
+            </div>
+            
+            <!-- Right Side: Documentation & Copyright -->
+            <div style="text-align: right; font-size: 0.875rem; line-height: 1.8;">
+                <p style="margin-bottom: 0.25rem;">
+                    <a href="#" onclick="app.navigate('docs'); return false;" 
+                       style="color: var(--primary); font-weight: 600; text-decoration: none; transition: color 0.3s ease; cursor: pointer;"
+                       onmouseover="this.style.color='var(--gray-600)'"
+                       onmouseout="this.style.color='var(--primary)'">
+                        Documentation
+                    </a>
+                </p>
+                <p style="color: var(--gray-500); margin-bottom: 0;">
+                    &copy; 2025 Creekside Lost & Found System<br>
+                    All rights reserved
+                </p>
+            </div>
+        </div>
+        
+        <!-- Mobile responsive footer -->
+        <style>
+            @media (max-width: 768px) {
+                footer > div {
+                    grid-template-columns: 1fr !important;
+                    gap: 1.5rem !important;
+                }
+                footer > div > div:last-child {
+                    text-align: left !important;
+                }
+            }
+        </style>
+    </footer>
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+        
+
+        // Application State and Logic
+        const app = {
+            currentPage: 'home',
+            items: [],
+            userClaims: [], // ALL claims in system
+            activityLog: [], // Activity log for admin tracking
+            currentUserEmail: '', // Current user's email for filtering claims
+            currentStudentId: '', // Current user's student ID for verification
+            isAdminAuthenticated: false,
+            ADMIN_PASSWORD: 'admin123', 
+            CATEGORIES: ['Electronics', 'Clothing', 'Books', 'Sports Equipment', 'Accessories', 'Other'],
+            
+            // Category color mapping for visual tags
+            CATEGORY_COLORS: {
+                'Electronics': { bg: '#dbeafe', text: '#1e40af', icon: '📱' },
+                'Clothing': { bg: '#dcfce7', text: '#166534', icon: '👕' },
+                'Books': { bg: '#fed7aa', text: '#9a3412', icon: '📚' },
+                'Sports Equipment': { bg: '#fce7f3', text: '#9f1239', icon: '⚽' },
+                'Accessories': { bg: '#e9d5ff', text: '#6b21a8', icon: '🎒' },
+                'Other': { bg: '#e5e7eb', text: '#374151', icon: '📦' }
+            },
+
+            /**
+             * Initialize the application
+             * Called when page loads
+             */
+            init() {
+                this.loadItems();
+                this.loadUserClaims();
+                this.loadActivityLog();
+                this.loadCurrentUserEmail();
+                this.loadCurrentStudentId();
+                
+                // Check if URL has item hash (from QR code scan)
+                this.checkURLHash();
+                
+                this.navigate('home');
+            },
+            
+            /**
+             * Check URL hash for QR code item links
+             * Format: #item-1234567890
+             */
+            checkURLHash() {
+                const hash = window.location.hash;
+                
+                if (hash.startsWith('#item-')) {
+                    const itemId = parseInt(hash.substring(6)); // Remove '#item-'
+                    
+                    // Wait for page to render, then navigate to item
+                    setTimeout(() => {
+                        this.navigateToItem(itemId);
+                    }, 500);
+                }
+            },
+            
+            /**
+             * Navigate to specific item from QR code
+             * @param {number} itemId - Item ID to navigate to
+             */
+            navigateToItem(itemId) {
+                const item = this.items.find(i => i.id === itemId);
+                
+                if (!item) {
+                    this.showToast('Item not found. It may have been claimed already.', 'error');
+                    this.navigate('items');
+                    return;
+                }
+                
+                if (item.status !== 'approved') {
+                    this.showToast('This item is pending admin approval.', 'error');
+                    this.navigate('items');
+                    return;
+                }
+                
+                // Navigate to search page
+                this.navigate('items');
+                
+                // Wait for items to render, then scroll to and highlight item
+                setTimeout(() => {
+                    const itemCard = document.querySelector(`[data-item-id="${itemId}"]`);
+                    
+                    if (itemCard) {
+                        // Scroll to item
+                        itemCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        
+                        // Highlight item with animation
+                        itemCard.style.animation = 'highlight 2s ease-in-out';
+                        itemCard.style.boxShadow = '0 0 0 4px var(--primary), 0 10px 30px rgba(239, 68, 68, 0.3)';
+                        
+                        // Show success message
+                        this.showToast(`Found: ${item.itemName}! Scroll down to claim.`, 'success');
+                        
+                        // Remove highlight after 3 seconds
+                        setTimeout(() => {
+                            itemCard.style.animation = '';
+                            itemCard.style.boxShadow = '';
+                        }, 3000);
+                    }
+                }, 600);
+                
+                // Clear hash from URL
+                history.replaceState(null, null, ' ');
+            },
+
+            /**
+             * Toast notification system
+             * Displays non-blocking success/error messages
+             * @param {string} message - Message to display
+             * @param {string} type - 'success', 'error', 'warning', or 'info'
+             * @param {string} title - title for the toast
+             */
+            showToast(message, type = 'success', title = null) {
+                const container = document.getElementById('toastContainer');
+                if (!container) return;
+
+                const icons = {
+                    success: '✅',
+                    error: '❌',
+                    warning: '⚠️',
+                    info: 'ℹ️'
+                };
+
+                const titles = {
+                    success: 'Success',
+                    error: 'Error',
+                    warning: 'Warning',
+                    info: 'Info'
+                };
+
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.innerHTML = `
+                    <div class="toast-icon">${icons[type] || icons.info}</div>
+                    <div class="toast-content">
+                        <div class="toast-title">${title || titles[type]}</div>
+                        <div class="toast-message">${message}</div>
+                    </div>
+                    <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+                `;
+
+                container.appendChild(toast);
+
+                // Auto-remove after 3 seconds
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.remove();
+                    }
+                }, 3000);
+            },
+
+            // Character counter for textarea
+            updateCharCount(textarea) {
+                const count = textarea.value.length;
+                const max = textarea.maxLength;
+                const counter = document.getElementById('charCounter');
+                
+                if (counter) {
+                    counter.textContent = `${count}/${max} characters`;
+                    
+                    // Update styling based on count
+                    counter.classList.remove('warning', 'danger');
+                    if (count > max * 0.9) {
+                        counter.classList.add('danger');
+                    } else if (count > max * 0.75) {
+                        counter.classList.add('warning');
+                    }
+                }
+            },
+
+            // Storage functions
+            loadItems() {
+                const stored = localStorage.getItem('lostFoundItems');
+                this.items = stored ? JSON.parse(stored) : [];
+                
+                // Ensure all items have a claims array (for backwards compatibility)
+                this.items.forEach(item => {
+                    if (!item.claims) {
+                        item.claims = [];
+                    }
+                });
+            },
+
+            saveItems() {
+                localStorage.setItem('lostFoundItems', JSON.stringify(this.items));
+            },
+
+            loadUserClaims() {
+                const stored = localStorage.getItem('myLostFoundClaims');
+                this.userClaims = stored ? JSON.parse(stored) : [];
+            },
+
+            saveUserClaims() {
+                localStorage.setItem('myLostFoundClaims', JSON.stringify(this.userClaims));
+            },
+
+            loadCurrentUserEmail() {
+                const stored = localStorage.getItem('currentUserEmail');
+                this.currentUserEmail = stored || '';
+            },
+
+            saveCurrentUserEmail(email) {
+                this.currentUserEmail = email;
+                localStorage.setItem('currentUserEmail', email);
+            },
+
+            loadCurrentStudentId() {
+                const stored = localStorage.getItem('currentStudentId');
+                this.currentStudentId = stored || '';
+            },
+
+            saveCurrentStudentId(studentId) {
+                this.currentStudentId = studentId;
+                localStorage.setItem('currentStudentId', studentId);
+            },
+
+            // Activity Log Functions
+            loadActivityLog() {
+                const stored = localStorage.getItem('activityLog');
+                this.activityLog = stored ? JSON.parse(stored) : [];
+            },
+
+            saveActivityLog() {
+                localStorage.setItem('activityLog', JSON.stringify(this.activityLog));
+            },
+
+            addActivity(action, details) {
+                const activity = {
+                    id: Date.now(),
+                    timestamp: new Date().toISOString(),
+                    action: action,
+                    details: details
+                };
+                this.activityLog.unshift(activity); // Add to beginning
+                // Keep only last 100 activities
+                if (this.activityLog.length > 100) {
+                    this.activityLog = this.activityLog.slice(0, 100);
+                }
+                this.saveActivityLog();
+            },
+
+            // Import/Export Functions
+            exportData() {
+                const data = {
+                    items: this.items,
+                    userClaims: this.userClaims,
+                    activityLog: this.activityLog,
+                    exportDate: new Date().toISOString(),
+                    version: '1.0'
+                };
+
+                const dataStr = JSON.stringify(data, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `lost-found-backup-${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+
+                this.addActivity('Data Exported', `Exported ${this.items.length} items and ${this.userClaims.length} claims`);
+                this.showToast('Data exported successfully!', 'success');
+            },
+
+            importData(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        
+                        // Validate data structure
+                        if (!data.items || !Array.isArray(data.items)) {
+                            throw new Error('Invalid data format');
+                        }
+
+                        // Merge imported data with existing data
+                        const itemsBefore = this.items.length;
+                        const claimsBefore = this.userClaims.length;
+
+                        // Merge items (avoid duplicates by ID)
+                        const existingIds = new Set(this.items.map(i => i.id));
+                        data.items.forEach(item => {
+                            if (!existingIds.has(item.id)) {
+                                this.items.push(item);
+                            }
+                        });
+
+                        // Merge claims
+                        const existingClaimIds = new Set(this.userClaims.map(c => c.id));
+                        if (data.userClaims) {
+                            data.userClaims.forEach(claim => {
+                                if (!existingClaimIds.has(claim.id)) {
+                                    this.userClaims.push(claim);
+                                }
+                            });
+                        }
+
+                        // Merge activity log
+                        if (data.activityLog) {
+                            const existingActivityIds = new Set(this.activityLog.map(a => a.id));
+                            data.activityLog.forEach(activity => {
+                                if (!existingActivityIds.has(activity.id)) {
+                                    this.activityLog.push(activity);
+                                }
+                            });
+                        }
+
+                        this.saveItems();
+                        this.saveUserClaims();
+                        this.saveActivityLog();
+
+                        const itemsAdded = this.items.length - itemsBefore;
+                        const claimsAdded = this.userClaims.length - claimsBefore;
+
+                        this.addActivity('Data Imported', `Imported ${itemsAdded} new items and ${claimsAdded} new claims`);
+                        this.showToast(`Data imported! Added ${itemsAdded} items and ${claimsAdded} claims`, 'success');
+                        this.render();
+
+                    } catch (error) {
+                        console.error('Import error:', error);
+                        this.showToast('Failed to import data. Invalid file format.', 'error');
+                    }
+                };
+                reader.readAsText(file);
+
+                // Reset file input
+                event.target.value = '';
+            },
+
+            resetSystem() {
+                this.showConfirm(
+                    '⚠️ Reset All Data?',
+                    'This will permanently delete ALL items, claims, and activity logs.\n\nThis action CANNOT be undone!\n\nConsider exporting your data first as a backup.',
+                    (confirmed) => {
+                        if (confirmed) {
+                            const itemCount = this.items.length;
+                            const claimCount = this.userClaims.length;
+
+                            this.items = [];
+                            this.userClaims = [];
+                            this.activityLog = [];
+                            
+                            this.saveItems();
+                            this.saveUserClaims();
+                            this.saveActivityLog();
+
+                            this.showToast(`System reset! Deleted ${itemCount} items and ${claimCount} claims`, 'success');
+                            this.render();
+                        }
+                    }
+                );
+            },
+
+            // Duplicate Detection
+            findDuplicates(itemName, category) {
+                // Get words from item name (3+ characters)
+                const words = itemName.toLowerCase().split(/\s+/).filter(w => w.length >= 3);
+                
+                return this.items.filter(item => {
+                    // Must be same category
+                    if (item.category !== category) return false;
+                    
+                    // Get words from existing item
+                    const itemWords = item.itemName.toLowerCase().split(/\s+/).filter(w => w.length >= 3);
+                    
+                    // Check if any word matches
+                    return words.some(word => 
+                        itemWords.some(itemWord => 
+                            word === itemWord || 
+                            word.includes(itemWord) || 
+                            itemWord.includes(word)
+                        )
+                    );
+                });
+            },
+
+            /**
+             * Compress image to reduce storage size
+             * Resizes to max 800px width and converts to JPEG at 70% quality
+             * @param {string} base64Str - Base64 image data
+             * @returns {Promise<string>} Compressed base64 image
+             */
+            async compressImage(base64Str) {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.src = base64Str;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 800;
+                        const scale = Math.min(1, MAX_WIDTH / img.width);
+                        canvas.width = img.width * scale;
+                        canvas.height = img.height * scale;
+                        
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        
+                        // Return compressed JPEG at 70% quality
+                        resolve(canvas.toDataURL('image/jpeg', 0.7));
+                    };
+                });
+            },
+
+            // Navigation
+            navigate(page) {
+                this.currentPage = page;
+                
+                // Update active state for all nav buttons (both desktop and mobile)
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.page === page) {
+                        btn.classList.add('active');
+                    }
+                });
+
+                // Close mobile menu and update aria-expanded
+                const mobileMenu = document.getElementById('mobileMenu');
+                const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+                if (mobileMenu) {
+                    mobileMenu.classList.remove('active');
+                }
+                if (mobileMenuBtn) {
+                    mobileMenuBtn.setAttribute('aria-expanded', 'false');
+                }
+
+                // Reset admin auth if navigating away from admin
+                if (page === 'admin') {
+                    this.isAdminAuthenticated = false;
+                }
+
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                this.render();
+            },
+
+            getPageIcon(page) {
+                const icons = { home: '🏠', items: '🔍', submit: '➕', admin: '🛡️' };
+                return icons[page] || '';
+            },
+
+            toggleMobileMenu() {
+                const menu = document.getElementById('mobileMenu');
+                const btn = document.querySelector('.mobile-menu-btn');
+                const isActive = menu.classList.toggle('active');
+                btn.setAttribute('aria-expanded', isActive);
+            },
+
+            // Render functions
+            render() {
+                const content = document.getElementById('mainContent');
+                
+                switch(this.currentPage) {
+                    case 'home':
+                        content.innerHTML = this.renderHome();
+                        break;
+                    case 'items':
+                        content.innerHTML = this.renderItems();
+                        this.attachItemsListeners();
+                        break;
+                    case 'submit':
+                        content.innerHTML = this.renderSubmit();
+                        this.attachSubmitListeners();
+                        break;
+                    case 'my-claims':
+                        content.innerHTML = this.renderMyClaims();
+                        break;
+                    case 'docs':
+                        content.innerHTML = this.renderDocs();
+                        break;
+                    case 'admin':
+                        if (this.isAdminAuthenticated) {
+                            content.innerHTML = this.renderAdmin();
+                            this.attachAdminListeners();
+                        } else {
+                            content.innerHTML = this.renderAdminLogin();
+                            this.attachAdminLoginListeners();
+                        }
+                        break;
+                }
+            },
+
+            renderHome() {
+                const approvedItems = this.items.filter(i => i.status === 'approved');
+                const recentItems = approvedItems.slice(0, 5);
+
+                return `
+                    <div class="hero card">
+                        <div class="hero-content">
+                            <div class="hero-icon" aria-hidden="true"> <h1>Welcome to</h1></div>
+                            <h1>Creekside's Lost & Found</h1>
+                            <p>Help reunite lost items with their owners</p>
+                            <div class="hero-buttons">
+                                <button class="btn btn-secondary" onclick="app.navigate('submit')" aria-label="Report a found item">
+                                    ➕ Report Found Item
+                                </button>
+                                <button class="btn btn-primary" onclick="app.navigate('items')" aria-label="Search for lost items">
+                                    🔍 Search Items
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 mb-4">
+                        <div class="card feature-card card-hover" onclick="app.navigate('submit')" role="button" tabindex="0" onkeypress="if(event.key==='Enter') app.navigate('submit')" aria-label="Navigate to report found item page">
+                            <div class="feature-icon blue" aria-hidden="true">📤</div>
+                            <h3>Report Found Items</h3>
+                            <p>Found something? Submit it here with photos and detailed descriptions to help identify the owner.</p>
+                        </div>
+                        <div class="card feature-card card-hover" onclick="app.navigate('items')" role="button" tabindex="0" onkeypress="if(event.key==='Enter') app.navigate('items')" aria-label="Navigate to search lost items page">
+                            <div class="feature-icon green" aria-hidden="true">🔍</div>
+                            <h3>Search Lost Items</h3>
+                            <p>Browse and search through all reported items using our advanced filtering system.</p>
+                        </div>
+                        <div class="card feature-card card-hover" onclick="app.navigate('my-claims')" role="button" tabindex="0" onkeypress="if(event.key==='Enter') app.navigate('my-claims')" aria-label="Navigate to my claims page">
+                            <div class="feature-icon purple" aria-hidden="true">✉️</div>
+                            <h3>Claim Your Item</h3>
+                            <p>Found your lost item? Submit a claim with identifying details for verification.</p>
+                        </div>
+                    </div>
+
+                    <div class="card card-body">
+                        <h2 class="mb-2">📋 Recent Items</h2>
+                        ${recentItems.length === 0 ? `
+                            <div class="empty-state">
+                                <div class="empty-icon" aria-hidden="true">📦</div>
+                                <p>No items reported yet. Be the first to help!</p>
+                            </div>
+                        ` : `
+                            ${recentItems.map(item => `
+                                <div class="recent-item">
+                                    <div>
+                                        <div style="font-weight: 700; font-size: 1.125rem; color: var(--gray-900);">${item.itemName}</div>
+                                        <div style="font-size: 0.95rem; color: var(--gray-600); margin-top: 0.25rem;">
+                                            📍 ${item.location} • 📅 ${item.date}
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm" onclick="app.navigate('items')" aria-label="View ${item.itemName}">
+                                        View Details
+                                    </button>
+                                </div>
+                            `).join('')}
+                        `}
+                    </div>
+
+                    <div class="info-banner">
+                        <h3>📖 How It Works</h3>
+                        <ol>
+                            <li><strong>Find an item?</strong> Report it with details and photos</li>
+                            <li><strong>Lost something?</strong> Search through reported items</li>
+                            <li><strong>See your item?</strong> Submit a claim with identifying information</li>
+                            <li><strong>Admin reviews</strong> and approves legitimate claims</li>
+                            <li><strong>Retrieve your item</strong> from the school office</li>
+                        </ol>
+                    </div>
+                `;
+            },
+
+            renderDocs() {
+    return `
+        <div class="card" style="max-width: 60rem; margin: 0 auto;">
+            <div class="card-body">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h1 style="font-size: 2.5rem; font-weight: 900; margin: 0;">📖 Documentation</h1>
+                    <button class="btn btn-secondary" onclick="app.navigate('home')">← Back to Home</button>
+                </div>
+
+                <!-- SCROLLABLE DOCUMENTATION BOX WITH YOUR CUSTOM TEXT -->
+                <div style="background: var(--gray-50); border: 2px solid var(--gray-300); border-radius: 0.75rem; 
+                    padding: 2rem; max-height: 500px; overflow-y: auto; margin-bottom: 2rem;
+                    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
+                    
+                    <h2 style="color: var(--primary); font-size: 1.75rem; font-weight: 800; margin-top: 0;">
+                        Welcome to the Lost & Found Documentation
+                    </h2>
+                    
+                    <p style="line-height: 1.8; color: var(--gray-700); margin-bottom: 1.5rem;">
+                        This is your custom documentation text. You can replace this with any content you'd like!
+                    </p>
+
+                    <h3 style="font-size: 1.25rem; font-weight: 700; margin-top: 1.5rem; color: var(--gray-800);">
+                        Getting Started
+                    </h3>
+                    <p style="line-height: 1.8; color: var(--gray-700);">
+                        To use this system, simply navigate to the appropriate section using the navigation menu at the top.
+                        Students can report found items, search for lost items, and submit claims.
+                    </p>
+
+                    <h3 style="font-size: 1.25rem; font-weight: 700; margin-top: 1.5rem; color: var(--gray-800);">
+                        How to Report Items
+                    </h3>
+                    <p style="line-height: 1.8; color: var(--gray-700);">
+                        Click the "Report" button in the navigation menu and fill out the form with item details.
+                        You can optionally upload a photo to help identify the item.
+                    </p>
+
+                    <h3 style="font-size: 1.25rem; font-weight: 700; margin-top: 1.5rem; color: var(--gray-800);">
+                        How to Claim Items
+                    </h3>
+                    <p style="line-height: 1.8; color: var(--gray-700);">
+                        Browse the items in the Search section. If you find your item, click "Claim This Item" and
+                        provide verification details. An administrator will review your claim.
+                    </p>
+
+                    <h3 style="font-size: 1.25rem; font-weight: 700; margin-top: 1.5rem; color: var(--gray-800);">
+                        Admin Access
+                    </h3>
+                    <p style="line-height: 1.8; color: var(--gray-700);">
+                        Administrators can approve items and claims through the Admin panel. The default password
+                        is displayed on the login page.
+                    </p>
+
+                    <h3 style="font-size: 1.25rem; font-weight: 700; margin-top: 1.5rem; color: var(--gray-800);">
+                        Advanced Features
+                    </h3>
+                    <ul style="line-height: 1.8; color: var(--gray-700); padding-left: 1.5rem;">
+                        <li>QR Code generation for physical posters</li>
+                        <li>Duplicate item detection</li>
+                        <li>Email notification templates</li>
+                        <li>Activity logging and analytics</li>
+                        <li>Data import/export for backups</li>
+                    </ul>
+
+                    <div style="background: linear-gradient(135deg, var(--primary-light) 0%, #93c5fd 100%); 
+                        padding: 1.5rem; border-radius: 0.5rem; margin-top: 2rem; border-left: 4px solid var(--primary);">
+                        <p style="font-size: 0.875rem; margin: 0; color: #1e3a8a;">
+                            <strong>💡 Pro Tip:</strong> Replace all of this text with your own custom documentation
+                            by editing the renderDocs() function in the JavaScript code!
+                        </p>
+                    </div>
+
+                    <!-- CITATIONS SECTION INSIDE SCROLLABLE BOX -->
+                    <div style="margin-top: 3rem; padding-top: 2rem; border-top: 2px solid var(--gray-300);">
+                        <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--gray-800); margin-bottom: 1rem;">
+                            📚 References & Citations
+                        </h3>
+                        
+                        <div style="font-size: 0.875rem; line-height: 2; color: var(--gray-700);">
+                            <p style="margin: 0.75rem 0;">
+                                <strong>[1]</strong> Mozilla Developer Network. (2024). <em>localStorage Web API Documentation</em>. 
+                                Retrieved from https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage
+                            </p>
+                            
+                            <p style="margin: 0.75rem 0;">
+                                <strong>[2]</strong> QRCode.js Library. (2024). <em>JavaScript QR Code Generation</em>. 
+                                Retrieved from https://github.com/davidshimjs/qrcodejs
+                            </p>
+                            
+                            <p style="margin: 0.75rem 0;">
+                                <strong>[3]</strong> W3C. (2024). <em>HTML5 Canvas API Specification</em>. 
+                                Retrieved from https://www.w3.org/TR/2dcontext/
+                            </p>
+                            
+                            <p style="margin: 0.75rem 0;">
+                                <strong>[4]</strong> Google Developers. (2024). <em>Web Performance Best Practices</em>. 
+                                Retrieved from https://developers.google.com/web/fundamentals/performance
+                            </p>
+                            
+                            <p style="margin: 0.75rem 0;">
+                                <strong>[5]</strong> Nielsen Norman Group. (2024). <em>Usability Heuristics for User Interface Design</em>. 
+                                Retrieved from https://www.nngroup.com/articles/ten-usability-heuristics/
+                            </p>
+                            
+                            <p style="margin: 0.75rem 0;">
+                                <strong>[6]</strong> MDN Web Docs. (2024). <em>JavaScript Promise API</em>. 
+                                Retrieved from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
+                            </p>
+                            
+                            <p style="margin: 0.75rem 0;">
+                                <strong>[7]</strong> Web Accessibility Initiative. (2024). <em>ARIA Authoring Practices Guide</em>. 
+                                Retrieved from https://www.w3.org/WAI/ARIA/apg/
+                            </p>
+                            
+                            <p style="margin: 0.75rem 0;">
+                                <strong>[8]</strong> Google. (2024). <em>Material Design Guidelines</em>. 
+                                Retrieved from https://material.io/design
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SOURCE CODE LINK BELOW THE BOX -->
+                <div style="text-align: center; padding: 2rem; border-top: 2px solid var(--gray-300);">
+                    <p style="font-size: 1.125rem; font-weight: 600; color: var(--gray-700); margin-bottom: 1rem;">
+                        📄 View Complete Source Code
+                    </p>
+                    <a href="https://github.com/yourusername/lost-and-found" 
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 1rem 2rem; 
+                       background: linear-gradient(135deg, #24292e 0%, #000000 100%); color: white; 
+                       text-decoration: none; border-radius: 0.75rem; font-weight: 700; font-size: 1.125rem;
+                       box-shadow: var(--shadow-lg); transition: all 0.3s;"
+                       onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 20px 25px -5px rgba(0,0,0,0.3)'"
+                       onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--shadow-lg)'">
+                        <svg width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                        </svg>
+                        Source Code
+                    </a>
+                    <p style="font-size: 0.875rem; color: var(--gray-500); margin-top: 1rem;">
+                        Click to view the complete source code on GitHub
+                    </p>
+                </div>
+            </div>
+        </div>
+    `;
+},
+
+            renderMyClaims() {
+                // If no email/student ID set, show entry form
+                if (!this.currentUserEmail || !this.currentStudentId) {
+                    return `
+                        <div class="card" style="max-width: 40rem; margin: 0 auto;">
+                            <div class="card-body">
+                                <h2 class="mb-2" style="font-size: 2rem; font-weight: 800; text-align: center;">📋 My Claims</h2>
+                                <p style="color: var(--gray-600); margin-bottom: 2rem; text-align: center;">Enter your email and student ID to view your claims</p>
+                                
+                                <div class="form-group">
+                                    <label for="emailInput" class="form-label">Email Address <span class="required">*</span></label>
+                                    <input type="email" id="emailInput" class="form-input" 
+                                        placeholder="student@school.edu" 
+                                        value="${this.currentUserEmail}"
+                                        required
+                                        aria-label="Enter your email address">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="studentIdInput" class="form-label">Student ID <span class="required">*</span></label>
+                                    <input type="text" id="studentIdInput" class="form-input" 
+                                        placeholder="123456" 
+                                        value="${this.currentStudentId}"
+                                        required
+                                        aria-label="Enter your student ID">
+                                </div>
+                                
+                                <button class="btn btn-primary" onclick="app.setUserCredentials()" style="width: 100%; margin-top: 1rem;">
+                                    📧 View My Claims
+                                </button>
+                                
+                                <div class="info-banner" style="margin-top: 1.5rem;">
+                                    <p style="font-size: 0.875rem; margin: 0;">
+                                        🔐 <strong>Security:</strong> Both email and student ID must match to view claims.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Filter claims by current user's email AND student ID (both must match)
+                const myClaims = this.userClaims.filter(claim => 
+                    claim.email && claim.email.toLowerCase() === this.currentUserEmail.toLowerCase() &&
+                    claim.studentId && claim.studentId === this.currentStudentId
+                );
+                
+                return `
+                    <div class="card" style="max-width: 60rem; margin: 0 auto;">
+                        <div class="card-body">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                                <div>
+                                    <h2 class="mb-2" style="font-size: 2rem; font-weight: 800;">📋 My Claims</h2>
+                                    <p style="color: var(--gray-600); margin: 0;">
+                                        Viewing claims for: <strong>${this.currentUserEmail}</strong> (ID: ${this.currentStudentId})
+                                    </p>
+                                </div>
+                                <button class="btn btn-outline" onclick="app.changeCredentials()" style="min-width: 180px;">
+                                    🔄 Change Login
+                                </button>
+                            </div>
+                            
+                            ${myClaims.length === 0 ? `
+                                <div class="empty-state">
+                                    <div class="empty-icon" aria-hidden="true">📋</div>
+                                    <p>No claims found for this email</p>
+                                    <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--gray-500);">
+                                        Browse items and submit a claim to get started
+                                    </p>
+                                    <button class="btn btn-primary" onclick="app.navigate('items')" style="margin-top: 1.5rem;">
+                                        🔍 Search Items
+                                    </button>
+                                </div>
+                            ` : `
+                                <table class="claims-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Item Name</th>
+                                            <th>Submitted Date</th>
+                                            <th>Status</th>
+                                            <th>Details</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${myClaims.map(claim => {
+                                            // Calculate days since submission
+                                            const submitDate = new Date(claim.submittedDate);
+                                            const today = new Date();
+                                            const daysSince = Math.floor((today - submitDate) / (1000 * 60 * 60 * 24));
+                                            
+                                            // Status message based on claim status
+                                            let statusMessage = '';
+                                            if (claim.status === 'Pending') {
+                                                if (daysSince === 0) {
+                                                    statusMessage = '⏳ Submitted today - Admin will review soon';
+                                                } else if (daysSince === 1) {
+                                                    statusMessage = '⏳ Submitted yesterday - Admin reviewing...';
+                                                } else {
+                                                    statusMessage = `⏳ Submitted ${daysSince} days ago - Under review`;
+                                                }
+                                            } else if (claim.status === 'Approved') {
+                                                statusMessage = '✅ Claim approved! Contact school office to retrieve your item.';
+                                            } else if (claim.status === 'Rejected') {
+                                                statusMessage = '❌ Claim was not approved. Contact admin if you have questions.';
+                                            } else if (claim.status === 'Reunited') {
+                                                statusMessage = '🎉 Item successfully reunited! Thank you for using Lost & Found.';
+                                            }
+                                            
+                                            // Format date for display
+                                            const displayDate = new Date(claim.submittedDate).toLocaleDateString();
+                                            
+                                            return `
+                                                <tr>
+                                                    <td style="font-weight: 700;">${claim.itemName}</td>
+                                                    <td>${displayDate}</td>
+                                                    <td>
+                                                        <span class="claim-status-badge status-${claim.status.toLowerCase()}">
+                                                            ${claim.status}
+                                                        </span>
+                                                    </td>
+                                                    <td style="font-size: 0.875rem; color: var(--gray-600); line-height: 1.6;">
+                                                        ${statusMessage}
+                                                        ${claim.status === 'Approved' ? `
+                                                            <button class="btn btn-success" 
+                                                                style="font-size: 0.75rem; padding: 0.35rem 0.75rem; margin-top: 0.5rem;"
+                                                                onclick="app.markAsReunited(${claim.id})">
+                                                                🎉 I Got My Item!
+                                                            </button>
+                                                        ` : ''}
+                                                    </td>
+                                                </tr>
+                                            `;
+                                        }).join('')}
+                                    </tbody>
+                                </table>
+                            `}
+                        </div>
+                    </div>
+                `;
+            },
+
+            markAsReunited(claimId) {
+                const claim = this.userClaims.find(c => c.id === claimId);
+                if (!claim) return;
+
+                this.showConfirm(
+                    '🎉 Confirm Item Retrieved',
+                    `Did you successfully pick up your "${claim.itemName}"?\n\nThis will mark the claim as reunited and help us track successful recoveries!`,
+                    (confirmed) => {
+                        if (confirmed) {
+                            claim.status = 'Reunited';
+                            claim.reunitedDate = new Date().toISOString();
+                            this.saveUserClaims();
+                            
+                            this.addActivity('Item Reunited', `"${claim.itemName}" successfully returned to student`);
+                            this.showToast('🎉 Awesome! Glad we could help reunite you with your item!', 'success');
+                            this.render();
+                        }
+                    }
+                );
+            },
+
+            renderItems() {
+                const approvedItems = this.items.filter(i => i.status === 'approved');
+                
+                return `
+                    <div class="card card-body mb-2">
+                        <h2 class="mb-2">🔍 Search Lost Items</h2>
+                        <div class="search-container">
+                            <div class="search-wrapper">
+                                <span class="search-icon" aria-hidden="true">🔍</span>
+                                <input type="search" id="searchInput" class="form-input search-input" 
+                                    placeholder="Search by name, description, or location..."
+                                    aria-label="Search items by name, description, or location">
+                            </div>
+                            <select id="categoryFilter" class="form-select" style="width: auto;" aria-label="Filter items by category">
+                                <option value="all">All Categories</option>
+                                ${this.CATEGORIES.map(cat => `<option value="${cat}">${cat}</option>`).join('')}
+                            </select>
+                        </div>
+                        <p style="font-size: 0.95rem; color: var(--gray-600);" id="itemCount" role="status" aria-live="polite">
+                            Showing ${approvedItems.length} ${approvedItems.length === 1 ? 'item' : 'items'}
+                        </p>
+                    </div>
+
+                    <div id="itemsContainer" class="items-grid" style="margin-bottom: 2rem;">
+                        ${approvedItems.length === 0 ? `
+                            <div class="card empty-state" style="grid-column: 1 / -1;">
+                                <div class="empty-icon" aria-hidden="true">📦</div>
+                                <p>No items found matching your criteria</p>
+                                <p style="margin-top: 0.5rem; font-size: 0.875rem;">Try adjusting your search or filters</p>
+                            </div>
+                        ` : approvedItems.map(item => this.renderItemCard(item)).join('')}
+                    </div>
+                `;
+            },
+
+            renderItemCard(item) {
+                // Find similar items
+                const similarItems = this.findSimilarItems(item);
+                
+                return `
+                    <article class="item-card card-hover" data-item-id="${item.id}" aria-label="${item.itemName}">
+                        ${item.image ? `
+                            <div class="item-image-wrapper">
+                                <img src="${item.image}" alt="Photo of ${item.itemName}" class="item-image">
+                            </div>
+                        ` : ''}
+                        <div class="item-content">
+                            <div class="item-header">
+                                <h3 class="item-title">${item.itemName}</h3>
+                                ${(() => {
+                                    const colors = this.CATEGORY_COLORS[item.category] || this.CATEGORY_COLORS['Other'];
+                                    return `<span class="item-category" aria-label="Category: ${item.category}" 
+                                        style="background: ${colors.bg}; color: ${colors.text};">
+                                        ${colors.icon} ${item.category}
+                                    </span>`;
+                                })()}
+                            </div>
+                            ${similarItems.length > 0 ? `
+                                <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); 
+                                    padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 1rem; 
+                                    border-left: 3px solid var(--warning); font-size: 0.875rem; font-weight: 600;">
+                                    🔍 ${similarItems.length} similar ${similarItems.length === 1 ? 'item' : 'items'} found
+                                </div>
+                            ` : ''}
+                            <p class="item-description">${item.description}</p>
+                            <div class="item-details">
+                                <p><strong>📍 Location:</strong> ${item.location}</p>
+                                <p><strong>📅 Date Found:</strong> ${item.date}</p>
+                            </div>
+                            <button class="btn btn-secondary" style="width: 100%; margin-bottom: 0.75rem;" onclick="app.showQRCode(${item.id})" 
+                                aria-label="Generate QR code for ${item.itemName}">
+                                📱 Generate QR Code Poster
+                            </button>
+                            <button class="btn btn-primary" style="width: 100%;" onclick="app.showClaimModal(${item.id})" 
+                                aria-label="Claim ${item.itemName}">
+                                🎯 Claim This Item
+                            </button>
+                        </div>
+                    </article>
+                `;
+            },
+
+            // Find similar items based on name, category, and keywords
+            findSimilarItems(currentItem) {
+                // Get all approved items except current one
+                const approvedItems = this.items.filter(i => i.status === 'approved' && i.id !== currentItem.id);
+                
+                // Filter by same category first
+                const sameCategory = approvedItems.filter(item => item.category === currentItem.category);
+                
+                // Get words from current item name (lowercase, remove short words)
+                const currentWords = currentItem.itemName.toLowerCase().split(/\s+/).filter(w => w.length >= 3);
+                
+                // Find items with at least one matching word
+                const similar = sameCategory.filter(item => {
+                    const itemWords = item.itemName.toLowerCase().split(/\s+/).filter(w => w.length >= 3);
+                    
+                    // Check if any word matches
+                    return currentWords.some(currentWord => 
+                        itemWords.some(itemWord => 
+                            currentWord === itemWord || 
+                            currentWord.includes(itemWord) || 
+                            itemWord.includes(currentWord)
+                        )
+                    );
+                });
+                
+                // Debug logging
+                console.log('Current item:', currentItem.itemName);
+                console.log('Same category items:', sameCategory.length);
+                console.log('Similar items found:', similar.length, similar.map(i => i.itemName));
+                
+                return similar;
+            },
+
+            attachItemsListeners() {
+                const searchInput = document.getElementById('searchInput');
+                const categoryFilter = document.getElementById('categoryFilter');
+                let searchTimeout;
+                
+                const filterItems = () => {
+                    const searchQuery = searchInput.value.toLowerCase();
+                    const category = categoryFilter.value;
+                    
+                    // Show loading state
+                    document.getElementById('itemsContainer').innerHTML = `
+                        <div class="search-loading" style="grid-column: 1 / -1;">
+                            <div class="search-loading-spinner"></div>
+                            <p style="font-size: 1.125rem; font-weight: 600;">Searching items...</p>
+                        </div>
+                    `;
+                    
+                    // Simulate search delay (500ms)
+                    setTimeout(() => {
+                        const filtered = this.items.filter(item => {
+                            if (item.status !== 'approved') return false;
+                            
+                            const matchesSearch = 
+                                item.itemName.toLowerCase().includes(searchQuery) ||
+                                item.description.toLowerCase().includes(searchQuery) ||
+                                item.location.toLowerCase().includes(searchQuery);
+                            
+                            const matchesCategory = category === 'all' || item.category === category;
+                            
+                            return matchesSearch && matchesCategory;
+                        });
+                        
+                        const itemCount = document.getElementById('itemCount');
+                        itemCount.textContent = `Showing ${filtered.length} ${filtered.length === 1 ? 'item' : 'items'}`;
+                        
+                        document.getElementById('itemsContainer').innerHTML = 
+                            filtered.length === 0 ? `
+                                <div class="card empty-state" style="grid-column: 1 / -1;">
+                                    <div class="empty-icon" aria-hidden="true">📦</div>
+                                    <p>No items found matching your criteria</p>
+                                    <p style="margin-top: 0.5rem; font-size: 0.875rem;">Try adjusting your search or filters</p>
+                                </div>
+                            ` : filtered.map(item => this.renderItemCard(item)).join('');
+                    }, 500); // 500ms delay
+                };
+                
+                // Debounce search input
+                searchInput.addEventListener('input', () => {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(filterItems, 300);
+                });
+                
+                categoryFilter.addEventListener('change', filterItems);
+            },
+
+            renderSubmit() {
+                return `
+                    <div class="card" style="max-width: 50rem; margin: 0 auto;">
+                        <div class="card-body">
+                            <h2 class="mb-2" style="font-size: 2rem; font-weight: 800;">📝 Report Found Item</h2>
+                            <p style="color: var(--gray-600); margin-bottom: 2rem;">Help reunite someone with their lost item by providing detailed information.</p>
+                            
+                            <form id="submitForm">
+                                <div class="form-group">
+                                    <label for="itemName" class="form-label">Item Name <span class="required">*</span></label>
+                                    <input type="text" id="itemName" class="form-input" required 
+                                        placeholder="e.g., Blue backpack with logo"
+                                        aria-required="true">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="category" class="form-label">Category <span class="required">*</span></label>
+                                    <select id="category" class="form-select" required aria-required="true">
+                                        <option value="">Select a category</option>
+                                        ${this.CATEGORIES.map(cat => `<option value="${cat}">${cat}</option>`).join('')}
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="location" class="form-label">Location Found <span class="required">*</span></label>
+                                    <input type="text" id="location" class="form-input" required 
+                                        placeholder="e.g., Cafeteria, Gym, Near Library"
+                                        aria-required="true">
+                                    <p class="help-text">Be as specific as possible to help the owner identify the location</p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="date" class="form-label">Date Found <span class="required">*</span></label>
+                                    <input type="date" id="date" class="form-input" required aria-required="true">
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="description" class="form-label">Description <span class="required">*</span></label>
+                                    <textarea id="description" class="form-textarea" required 
+                                        maxlength="500"
+                                        oninput="app.updateCharCount(this)"
+                                        placeholder="Describe the item in detail: color, size, brand, unique features, contents, condition, etc."
+                                        aria-required="true"></textarea>
+                                    <p class="help-text">The more details you provide, the easier it is to identify the rightful owner</p>
+                                    <p class="char-counter" id="charCounter">0/500 characters</p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="itemImage" class="form-label">Upload Photo (Optional but recommended)</label>
+                                    <input type="file" id="itemImage" accept="image/*" 
+                                        onchange="app.handleImageUpload(event)"
+                                        class="form-input"
+                                        aria-label="Upload a photo of the found item">
+                                    <p class="help-text">📸 Maximum file size: 5MB • Accepted formats: JPG, PNG, GIF</p>
+                                    <div id="imagePreview" class="hidden image-preview-container">
+                                        <img id="previewImg" style="max-width: 400px; width: 100%;" alt="Preview of uploaded item photo">
+                                        <button type="button" class="remove-image-btn" onclick="app.removeImage()" aria-label="Remove uploaded image">
+                                            ✕
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <fieldset style="border: 2px solid var(--gray-200); border-radius: 1rem; padding: 1.5rem; margin-top: 2rem;">
+                                    <legend style="font-weight: 700; padding: 0 0.5rem; color: var(--gray-900); font-size: 1.125rem;">👤 Your Information</legend>
+                                    
+                                    <div class="form-group">
+                                        <label for="finderName" class="form-label">Your Name <span class="required">*</span></label>
+                                        <input type="text" id="finderName" class="form-input" required 
+                                            placeholder="First and Last Name"
+                                            aria-required="true">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="finderContact" class="form-label">Contact Email <span class="required">*</span></label>
+                                        <input type="email" id="finderContact" class="form-input" required 
+                                            placeholder="your.email@school.edu"
+                                            aria-required="true">
+                                        <p class="help-text">We'll use this to contact you about the item and potential claims</p>
+                                    </div>
+                                </fieldset>
+
+                                <div class="flex gap-2 flex-wrap" style="margin-top: 2rem;">
+                                    <button type="submit" class="btn btn-primary" style="flex: 1;" aria-label="Submit found item report">
+                                        ✓ Submit Item Report
+                                    </button>
+                                    <button type="button" class="btn btn-outline" onclick="app.navigate('home')" aria-label="Cancel and return to home">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                `;
+            },
+
+            attachSubmitListeners() {
+                document.getElementById('submitForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleSubmit();
+                });
+            },
+
+
+            async handleImageUpload(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    if (file.size > 5000000) {
+                        alert('⚠️ Image size must be less than 5MB. Please choose a smaller file.');
+                        event.target.value = '';
+                        return;
+                    }
+                    
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        // Compress the image before displaying
+                        const compressed = await this.compressImage(e.target.result);
+                        document.getElementById('imagePreview').classList.remove('hidden');
+                        document.getElementById('previewImg').src = compressed;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            },
+
+            removeImage() {
+                document.getElementById('imagePreview').classList.add('hidden');
+                document.getElementById('previewImg').src = '';
+                document.getElementById('itemImage').value = '';
+            },
+
+            /**
+             * Handle form submission for reporting found items
+             * Creates new item object, sets status to 'pending' for admin review
+             * Saves to localStorage and shows confirmation
+             */
+            handleSubmit() {
+                const itemName = document.getElementById('itemName').value;
+                const category = document.getElementById('category').value;
+                
+                // Check for duplicates
+                const duplicates = this.findDuplicates(itemName, category);
+                
+                if (duplicates.length > 0) {
+                    const dupNames = duplicates.slice(0, 3).map(d => d.itemName).join(', ');
+                    this.showConfirm(
+                        '⚠️ Similar Items Found',
+                        `We found ${duplicates.length} similar item(s) already reported:\n\n${dupNames}\n\nAre you sure this is a different item?`,
+                        (confirmed) => {
+                            if (confirmed) {
+                                this.submitNewItem();
+                            }
+                        }
+                    );
+                } else {
+                    this.submitNewItem();
+                }
+            },
+
+            submitNewItem() {
+                const newItem = {
+                    id: Date.now(),
+                    itemName: document.getElementById('itemName').value,
+                    category: document.getElementById('category').value,
+                    location: document.getElementById('location').value,
+                    date: document.getElementById('date').value,
+                    description: document.getElementById('description').value,
+                    finderName: document.getElementById('finderName').value,
+                    finderContact: document.getElementById('finderContact').value,
+                    image: document.getElementById('previewImg').src || null,
+                    status: 'pending',
+                    submittedDate: new Date().toISOString(),
+                    claims: []
+                };
+
+                this.items.push(newItem);
+                this.saveItems();
+                this.addActivity('Item Submitted', `"${newItem.itemName}" (${newItem.category}) by ${newItem.finderName}`);
+                this.showToast('Item submitted successfully!', 'success');
+                this.navigate('home');
+            },
+
+            showClaimModal(itemId) {
+                const item = this.items.find(i => i.id === itemId);
+                if (!item) return;
+
+                const modalHtml = `
+                    <div class="modal-overlay" id="claimModal" onclick="app.closeModalOnBackdrop(event)" role="dialog" aria-modal="true" aria-labelledby="claimModalTitle">
+                        <div class="modal">
+                            <div class="modal-header">
+                                <h2 class="modal-title" id="claimModalTitle">🎯 Claim Item</h2>
+                                <button class="modal-close" onclick="app.closeClaimModal()" aria-label="Close claim form">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="info-banner" style="margin-top: 0;">
+                                    <h3 style="font-size: 1.25rem; margin-bottom: 0.5rem;">${item.itemName}</h3>
+                                    <p style="font-size: 0.95rem; color: #1e3a8a;">📍 Found at <strong>${item.location}</strong> on <strong>${item.date}</strong></p>
+                                </div>
+
+                                <form id="claimForm">
+                                    <input type="hidden" id="claimItemId" value="${itemId}">
+                                    
+                                    <div class="form-group">
+                                        <label for="claimerName" class="form-label">Your Name <span class="required">*</span></label>
+                                        <input type="text" id="claimerName" class="form-input" required 
+                                            placeholder="First and Last Name"
+                                            aria-required="true">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="claimerEmail" class="form-label">Email Address <span class="required">*</span></label>
+                                        <input type="email" id="claimerEmail" class="form-input" required 
+                                            placeholder="your.email@school.edu"
+                                            aria-required="true">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="studentId" class="form-label">Student ID <span class="required">*</span></label>
+                                        <input type="text" id="studentId" class="form-input" required 
+                                            placeholder="Enter your student ID number"
+                                            aria-required="true">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="claimDescription" class="form-label">Why do you believe this is your item? <span class="required">*</span></label>
+                                        <textarea id="claimDescription" class="form-textarea" required 
+                                            placeholder="Provide specific identifying details: unique features, contents, where you lost it, when you last saw it, etc."
+                                            aria-required="true"></textarea>
+                                        <p class="help-text">🔍 Be as specific as possible to help verify ownership. The more details you provide, the faster your claim can be processed.</p>
+                                    </div>
+
+                                    <div class="flex gap-2 flex-wrap">
+                                        <button type="submit" class="btn btn-primary" style="flex: 1;" aria-label="Submit claim for this item">
+                                            ✓ Submit Claim
+                                        </button>
+                                        <button type="button" class="btn btn-outline" onclick="app.closeClaimModal()" aria-label="Cancel claim submission">
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                document.getElementById('claimForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleClaimSubmit();
+                });
+
+                // Focus first input for accessibility
+                setTimeout(() => {
+                    document.getElementById('claimerName').focus();
+                }, 100);
+            },
+
+            closeClaimModal() {
+                const modal = document.getElementById('claimModal');
+                if (modal) modal.remove();
+            },
+
+            closeModalOnBackdrop(event) {
+                if (event.target.classList.contains('modal-overlay')) {
+                    this.closeClaimModal();
+                }
+            },
+
+            // QR Code Functions
+            currentQRItem: null,
+
+            showQRCode(itemId) {
+                const item = this.items.find(i => i.id === itemId);
+                if (!item) return;
+
+                this.currentQRItem = item;
+
+                // Create item URL (using item ID in hash)
+                const itemURL = `${window.location.origin}${window.location.pathname}#item-${item.id}`;
+
+                // Show item info
+                document.getElementById('qrItemInfo').innerHTML = `
+                    <div style="background: var(--gray-100); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+                        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">${item.itemName}</h3>
+                        <p style="font-size: 0.875rem; color: var(--gray-600); margin: 0;">
+                            📍 ${item.location} • 📅 ${item.date}
+                        </p>
+                    </div>
+                    <p style="font-size: 0.875rem; color: var(--gray-600); margin-bottom: 1rem;">
+                        Scan this QR code to view item details and submit a claim!
+                    </p>
+                `;
+
+                // Clear previous QR code
+                const container = document.getElementById('qrCodeContainer');
+                container.innerHTML = '';
+
+                // Generate new QR code
+                new QRCode(container, {
+                    text: itemURL,
+                    width: 256,
+                    height: 256,
+                    colorDark: '#000000',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+
+                document.getElementById('qrModal').style.display = 'block';
+            },
+
+            downloadQRCode() {
+                const qrImage = document.querySelector('#qrCodeContainer img');
+                if (!qrImage || !this.currentQRItem) return;
+
+                // Create canvas to add item info
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = 600;
+                canvas.height = 700;
+
+                // White background
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Draw QR code
+                const img = new Image();
+                img.onload = () => {
+                    ctx.drawImage(img, 172, 50, 256, 256);
+
+                    // Add text
+                    ctx.fillStyle = '#000000';
+                    ctx.font = 'bold 32px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('Lost & Found', 300, 350);
+
+                    ctx.font = 'bold 28px Arial';
+                    ctx.fillText(this.currentQRItem.itemName, 300, 400);
+
+                    ctx.font = '20px Arial';
+                    ctx.fillText(`📍 ${this.currentQRItem.location}`, 300, 440);
+                    ctx.fillText(`📅 ${this.currentQRItem.date}`, 300, 470);
+
+                    ctx.font = 'bold 18px Arial';
+                    ctx.fillText('Scan to claim this item!', 300, 520);
+
+                    // Download
+                    const link = document.createElement('a');
+                    link.download = `qr-code-${this.currentQRItem.itemName.replace(/\s+/g, '-')}.png`;
+                    link.href = canvas.toDataURL();
+                    link.click();
+
+                    this.showToast('QR code downloaded!', 'success');
+                };
+                img.src = qrImage.src;
+            },
+
+            closeQRModal(event) {
+                if (event && !event.target.classList.contains('modal-overlay')) return;
+                document.getElementById('qrModal').style.display = 'none';
+                this.currentQRItem = null;
+            },
+
+            // Email Notification Functions
+            currentEmailData: null,
+
+            showEmailPreview(item, claim) {
+                this.currentEmailData = { item, claim };
+
+                const emailHTML = `
+                    <div style="margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 2px solid var(--gray-200);">
+                        <p style="margin: 0.25rem 0; font-size: 0.875rem;"><strong>To:</strong> ${claim.claimerEmail}</p>
+                        <p style="margin: 0.25rem 0; font-size: 0.875rem;"><strong>Subject:</strong> ✅ Your Lost Item Claim Has Been Approved!</p>
+                    </div>
+                    
+                    <div style="font-size: 0.95rem;">
+                        <p>Hi ${claim.claimerName},</p>
+                        
+                        <p><strong>Great news!</strong> Your claim for <strong>"${item.itemName}"</strong> has been approved!</p>
+                        
+                        <div style="background: linear-gradient(135deg, #dcfce7 0%, #86efac 100%); 
+                            padding: 1rem; border-radius: 0.5rem; margin: 1.5rem 0; border-left: 4px solid #22c55e;">
+                            <p style="margin: 0.5rem 0; font-weight: 600;">📍 Pick Up Location:</p>
+                            <p style="margin: 0.5rem 0;">Main Office, Creekside Middle School</p>
+                            
+                            <p style="margin: 0.5rem 0; font-weight: 600;">🕐 Office Hours:</p>
+                            <p style="margin: 0.5rem 0;">Monday - Friday: 8:00 AM - 3:00 PM</p>
+                            
+                            <p style="margin: 0.5rem 0; font-weight: 600;">🎒 What to Bring:</p>
+                            <p style="margin: 0.5rem 0;">• Your Student ID<br>• This email (digital or printed)</p>
+                        </div>
+                        
+                        <p style="font-weight: 600;">Item Details:</p>
+                        <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+                            <li><strong>Item:</strong> ${item.itemName}</li>
+                            <li><strong>Category:</strong> ${item.category}</li>
+                            <li><strong>Found at:</strong> ${item.location}</li>
+                            <li><strong>Date Found:</strong> ${item.date}</li>
+                        </ul>
+                        
+                        <p style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--gray-200); 
+                            font-size: 0.875rem; color: var(--gray-600);">
+                            <strong>Questions?</strong> Contact the Main Office at office@creekside.edu or (904) 555-0123.
+                        </p>
+                        
+                        <p style="font-size: 0.875rem; color: var(--gray-600);">
+                            Thank you for using the Lost & Found System!<br>
+                            <strong>- Creekside Lost & Found Team</strong>
+                        </p>
+                    </div>
+                `;
+
+                document.getElementById('emailContent').innerHTML = emailHTML;
+                document.getElementById('emailModal').style.display = 'block';
+            },
+
+            copyEmailText() {
+                const { item, claim } = this.currentEmailData;
+                
+                const emailText = `To: ${claim.claimerEmail}
+Subject: ✅ Your Lost Item Claim Has Been Approved!
+
+Hi ${claim.claimerName},
+
+Great news! Your claim for "${item.itemName}" has been approved!
+
+📍 PICK UP LOCATION:
+Main Office, Creekside Middle School
+
+🕐 OFFICE HOURS:
+Monday - Friday: 8:00 AM - 3:00 PM
+
+🎒 WHAT TO BRING:
+• Your Student ID
+• This email (digital or printed)
+
+ITEM DETAILS:
+• Item: ${item.itemName}
+• Category: ${item.category}
+• Found at: ${item.location}
+• Date Found: ${item.date}
+
+Questions? Contact the Main Office at office@creekside.edu or (904) 555-0123.
+
+Thank you for using the Lost & Found System!
+- Creekside Lost & Found Team`;
+
+                navigator.clipboard.writeText(emailText).then(() => {
+                    this.showToast('📋 Email copied to clipboard!', 'success');
+                }).catch(() => {
+                    this.showToast('Failed to copy. Please try again.', 'error');
+                });
+            },
+
+            openEmailApp() {
+                const { item, claim } = this.currentEmailData;
+                
+                const subject = encodeURIComponent('✅ Your Lost Item Claim Has Been Approved!');
+                const body = encodeURIComponent(`Hi ${claim.claimerName},
+
+Great news! Your claim for "${item.itemName}" has been approved!
+
+📍 PICK UP LOCATION:
+Main Office, Creekside Middle School
+
+🕐 OFFICE HOURS:
+Monday - Friday: 8:00 AM - 3:00 PM
+
+🎒 WHAT TO BRING:
+• Your Student ID
+• This email
+
+ITEM DETAILS:
+• Item: ${item.itemName}
+• Category: ${item.category}
+• Found at: ${item.location}
+• Date Found: ${item.date}
+
+Questions? Contact the Main Office at office@creekside.edu
+
+Thank you for using the Lost & Found System!
+- Creekside Lost & Found Team`);
+
+                window.location.href = `mailto:${claim.claimerEmail}?subject=${subject}&body=${body}`;
+                this.showToast('📧 Opening email app...', 'success');
+            },
+
+            closeEmailModal(event) {
+                if (event && !event.target.classList.contains('modal-overlay')) return;
+                document.getElementById('emailModal').style.display = 'none';
+                this.currentEmailData = null;
+            },
+
+            // Custom Confirmation Modal System
+            confirmCallback: null,
+
+            showConfirm(title, message, callback) {
+                this.confirmCallback = callback;
+                document.getElementById('confirmTitle').textContent = title;
+                document.getElementById('confirmMessage').textContent = message;
+                document.getElementById('confirmModal').style.display = 'block';
+            },
+
+            confirmOk() {
+                document.getElementById('confirmModal').style.display = 'none';
+                if (this.confirmCallback) {
+                    this.confirmCallback(true);
+                    this.confirmCallback = null;
+                }
+            },
+
+            cancelConfirm(event) {
+                // Check if clicked on backdrop or button
+                if (event && event.target.closest('.modal') && !event.target.classList.contains('modal-overlay')) {
+                    return; // Clicked inside modal, don't close
+                }
+                document.getElementById('confirmModal').style.display = 'none';
+                if (this.confirmCallback) {
+                    this.confirmCallback(false);
+                    this.confirmCallback = null;
+                }
+            },
+
+            // Email + Student ID based claim tracking functions
+            setUserCredentials() {
+                const emailInput = document.getElementById('emailInput');
+                const studentIdInput = document.getElementById('studentIdInput');
+                const email = emailInput.value.trim();
+                const studentId = studentIdInput.value.trim();
+                
+                if (!email) {
+                    alert('⚠️ Please enter your email address');
+                    emailInput.focus();
+                    return;
+                }
+                
+                // Basic email validation
+                if (!email.includes('@') || !email.includes('.')) {
+                    alert('⚠️ Please enter a valid email address');
+                    emailInput.focus();
+                    return;
+                }
+                
+                if (!studentId) {
+                    alert('⚠️ Please enter your student ID');
+                    studentIdInput.focus();
+                    return;
+                }
+                
+                // Save both credentials
+                this.saveCurrentUserEmail(email);
+                this.saveCurrentStudentId(studentId);
+                this.showToast(`🔐 Verified: ${email} (ID: ${studentId})`, 'success');
+                this.render();
+            },
+
+            changeCredentials() {
+                this.currentUserEmail = '';
+                this.currentStudentId = '';
+                localStorage.removeItem('currentUserEmail');
+                localStorage.removeItem('currentStudentId');
+                this.render();
+            },
+
+            handleClaimSubmit() {
+                const itemId = parseInt(document.getElementById('claimItemId').value);
+                const item = this.items.find(i => i.id === itemId);
+                
+                if (!item) return;
+
+                // Initialize claims array if it doesn't exist
+                if (!item.claims) {
+                    item.claims = [];
+                }
+
+                const claim = {
+                    id: Date.now(),
+                    claimerName: document.getElementById('claimerName').value,
+                    claimerEmail: document.getElementById('claimerEmail').value,
+                    studentId: document.getElementById('studentId').value,
+                    description: document.getElementById('claimDescription').value,
+                    claimDate: new Date().toISOString(),
+                    status: 'pending'
+                };
+
+                item.claims.push(claim);
+                this.saveItems();
+                
+                // Add to user's claims tracker WITH EMAIL AND STUDENT ID
+                this.userClaims.push({
+                    id: claim.id,
+                    itemId: itemId,
+                    itemName: item.itemName,
+                    email: claim.claimerEmail, // Store email for filtering
+                    studentId: claim.studentId, // Store student ID for verification
+                    submittedDate: new Date().toISOString(),
+                    status: 'Pending'
+                });
+                this.saveUserClaims();
+                
+                // Auto-set current user credentials if not set
+                if (!this.currentUserEmail) {
+                    this.saveCurrentUserEmail(claim.claimerEmail);
+                }
+                if (!this.currentStudentId) {
+                    this.saveCurrentStudentId(claim.studentId);
+                }
+                
+                this.addActivity('Claim Submitted', `"${item.itemName}" claimed by ${claim.claimerName}`);
+                this.closeClaimModal();
+                this.showToast('Claim submitted! Track it in "My Claims"', 'success');
+            },
+
+            renderAdminLogin() {
+                return `
+                    <div style="max-width: 30rem; margin: 3rem auto;">
+                        <div class="card card-body">
+                            <div class="text-center mb-4">
+                                <div style="width: 6rem; height: 6rem; background: linear-gradient(135deg, var(--primary-light) 0%, #93c5fd 100%); 
+                                    border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; 
+                                    font-size: 3rem; box-shadow: var(--shadow-xl);" aria-hidden="true">
+                                    🛡️
+                                </div>
+                                <h2 style="font-size: 2.25rem; font-weight: 800; margin-bottom: 0.75rem;">Admin Access</h2>
+                                <p style="color: var(--gray-600); font-size: 1.05rem;">Enter password to access the admin dashboard</p>
+                            </div>
+
+                            <form id="adminLoginForm">
+                                <div class="form-group">
+                                    <label for="adminPassword" class="form-label">Password</label>
+                                    <div style="position: relative;">
+                                        <input type="password" id="adminPassword" class="form-input" 
+                                            placeholder="Enter admin password" required
+                                            aria-required="true">
+                                        <button type="button" id="togglePassword" 
+                                            style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); 
+                                            background: none; border: none; cursor: pointer; font-size: 0.875rem; 
+                                            color: var(--primary); font-weight: 600; text-decoration: underline;"
+                                            onclick="app.togglePasswordVisibility()"
+                                            aria-label="Show password">
+                                            Show
+                                        </button>
+                                    </div>
+                                    <div id="loginError" class="hidden" style="color: var(--danger); font-size: 0.95rem; margin-top: 0.75rem; 
+                                        padding: 0.75rem; background: var(--danger-light); border-radius: 0.5rem; font-weight: 600;" role="alert">
+                                        ⚠️ Incorrect password. Please try again.
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1.5rem;" aria-label="Login to admin panel">
+                                    🔒 Login to Admin Panel
+                                </button>
+
+                                <div style="background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%); 
+                                    padding: 1.25rem; border-radius: 1rem; border: 2px solid var(--gray-200); box-shadow: var(--shadow);">
+                                    <p style="font-size: 0.875rem; color: var(--gray-700); text-align: center; margin-bottom: 0.5rem;">
+                                        <strong>🔐 Demo Credentials</strong>
+                                    </p>
+                                    <p style="font-size: 0.95rem; text-align: center; font-family: monospace; 
+                                        background: white; padding: 0.75rem; border-radius: 0.5rem; font-weight: 600;">
+                                        Password: ${this.ADMIN_PASSWORD}
+                                    </p>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                `;
+            },
+
+            attachAdminLoginListeners() {
+                document.getElementById('adminLoginForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const password = document.getElementById('adminPassword').value;
+                    
+                    if (password === this.ADMIN_PASSWORD) {
+                        this.isAdminAuthenticated = true;
+                        this.render();
+                    } else {
+                        document.getElementById('loginError').classList.remove('hidden');
+                        document.getElementById('adminPassword').value = '';
+                        document.getElementById('adminPassword').focus();
+                    }
+                });
+
+                document.getElementById('adminPassword').addEventListener('input', () => {
+                    document.getElementById('loginError').classList.add('hidden');
+                });
+            },
+
+            togglePasswordVisibility() {
+                const input = document.getElementById('adminPassword');
+                const btn = document.getElementById('togglePassword');
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    btn.textContent = 'Hide';
+                    btn.setAttribute('aria-label', 'Hide password');
+                } else {
+                    input.type = 'password';
+                    btn.textContent = 'Show';
+                    btn.setAttribute('aria-label', 'Show password');
+                }
+            },
+
+            renderAdminAnalytics() {
+                // Calculate analytics
+                const categoryStats = {};
+                const locationStats = {};
+                let totalClaims = 0;
+                let approvedClaims = 0;
+                
+                this.items.forEach(item => {
+                    // Category breakdown
+                    categoryStats[item.category] = (categoryStats[item.category] || 0) + 1;
+                    
+                    // Location breakdown
+                    locationStats[item.location] = (locationStats[item.location] || 0) + 1;
+                    
+                    // Claims stats
+                    if (item.claims && item.claims.length > 0) {
+                        totalClaims += item.claims.length;
+                        approvedClaims += item.claims.filter(c => c.status === 'approved').length;
+                    }
+                });
+                
+                // Get top categories
+                const topCategories = Object.entries(categoryStats)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 5);
+                
+                // Get top locations
+                const topLocations = Object.entries(locationStats)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 5);
+                
+                const maxCategoryCount = Math.max(...topCategories.map(c => c[1]), 1);
+                const maxLocationCount = Math.max(...topLocations.map(l => l[1]), 1);
+                const successRate = totalClaims > 0 ? Math.round((approvedClaims / totalClaims) * 100) : 0;
+                
+                return `
+                    <div class="card" style="margin-bottom: 3rem;">
+                        <div class="card-body">
+                            <h2 style="font-size: 1.75rem; font-weight: 800; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.75rem;">
+                                📊 Analytics Dashboard
+                            </h2>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                                <!-- Category Breakdown -->
+                                <div>
+                                    <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem; color: var(--gray-800);">
+                                        📂 Items by Category
+                                    </h3>
+                                    ${topCategories.length === 0 ? `
+                                        <p style="color: var(--gray-500); font-style: italic;">No items yet</p>
+                                    ` : topCategories.map(([category, count]) => `
+                                        <div style="margin-bottom: 1rem;">
+                                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                                <span style="font-weight: 600; color: var(--gray-700);">${category}</span>
+                                                <span style="font-weight: 700; color: var(--primary);">${count}</span>
+                                            </div>
+                                            <div style="background: var(--gray-200); height: 8px; border-radius: 1rem; overflow: hidden;">
+                                                <div style="background: linear-gradient(90deg, var(--primary) 0%, var(--danger) 100%); 
+                                                    height: 100%; width: ${(count / maxCategoryCount) * 100}%; border-radius: 1rem; 
+                                                    transition: width 0.5s;"></div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                
+                                <!-- Location Breakdown -->
+                                <div>
+                                    <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem; color: var(--gray-800);">
+                                        📍 Top Locations
+                                    </h3>
+                                    ${topLocations.length === 0 ? `
+                                        <p style="color: var(--gray-500); font-style: italic;">No items yet</p>
+                                    ` : topLocations.map(([location, count]) => `
+                                        <div style="margin-bottom: 1rem;">
+                                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                                <span style="font-weight: 600; color: var(--gray-700);">${location}</span>
+                                                <span style="font-weight: 700; color: var(--success);">${count}</span>
+                                            </div>
+                                            <div style="background: var(--gray-200); height: 8px; border-radius: 1rem; overflow: hidden;">
+                                                <div style="background: linear-gradient(90deg, var(--success) 0%, var(--purple) 100%); 
+                                                    height: 100%; width: ${(count / maxLocationCount) * 100}%; border-radius: 1rem; 
+                                                    transition: width 0.5s;"></div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                
+                                <!-- Success Metrics -->
+                                <div>
+                                    <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem; color: var(--gray-800);">
+                                        🎯 Success Metrics
+                                    </h3>
+                                    <div style="text-align: center; padding: 2rem; background: linear-gradient(135deg, var(--success-light) 0%, #6ee7b7 100%); 
+                                        border-radius: 1rem; margin-bottom: 1rem;">
+                                        <div style="font-size: 3rem; font-weight: 900; color: var(--success);">${successRate}%</div>
+                                        <div style="font-size: 1rem; font-weight: 600; color: #065f46;">Success Rate</div>
+                                    </div>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.95rem;">
+                                        <div style="text-align: center; padding: 1rem; background: var(--gray-50); border-radius: 0.75rem;">
+                                            <div style="font-size: 1.75rem; font-weight: 800; color: var(--primary);">${totalClaims}</div>
+                                            <div style="color: var(--gray-600); font-weight: 600;">Total Claims</div>
+                                        </div>
+                                        <div style="text-align: center; padding: 1rem; background: var(--gray-50); border-radius: 0.75rem;">
+                                            <div style="font-size: 1.75rem; font-weight: 800; color: var(--success);">${approvedClaims}</div>
+                                            <div style="color: var(--gray-600); font-weight: 600;">Reunited</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            },
+
+            renderActivityLog() {
+                const recentActivities = this.activityLog.slice(0, 20); // Show last 20 activities
+
+                return `
+                    <div class="card" style="margin-bottom: 3rem;">
+                        <div class="card-body">
+                            <h2 style="font-size: 1.75rem; font-weight: 800; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                                📊 Activity Log
+                            </h2>
+
+                            ${recentActivities.length === 0 ? `
+                                <div class="empty-state">
+                                    <div class="empty-icon" aria-hidden="true">📋</div>
+                                    <p>No activity recorded yet</p>
+                                </div>
+                            ` : `
+                                <div style="overflow-x: auto;">
+                                    <table class="claims-table">
+                                        <thead>
+                                            <tr>
+                                                <th style="min-width: 150px;">Time</th>
+                                                <th style="min-width: 180px;">Action</th>
+                                                <th>Details</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            ${recentActivities.map(activity => {
+                                                const date = new Date(activity.timestamp);
+                                                const timeStr = date.toLocaleString();
+                                                return `
+                                                    <tr>
+                                                        <td style="font-size: 0.875rem; color: var(--gray-600);">
+                                                            ${timeStr}
+                                                        </td>
+                                                        <td style="font-weight: 600;">
+                                                            ${activity.action}
+                                                        </td>
+                                                        <td style="font-size: 0.875rem; color: var(--gray-600);">
+                                                            ${activity.details}
+                                                        </td>
+                                                    </tr>
+                                                `;
+                                            }).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <p style="margin-top: 1rem; font-size: 0.875rem; color: var(--gray-500); text-align: center;">
+                                    Showing last ${recentActivities.length} activities • Total: ${this.activityLog.length} activities
+                                </p>
+                            `}
+                        </div>
+                    </div>
+                `;
+            },
+
+            renderAdmin() {
+                const pendingItems = this.items.filter(i => i.status === 'pending');
+                const approvedItems = this.items.filter(i => i.status === 'approved');
+                const itemsWithClaims = approvedItems.filter(i => i.claims && i.claims.length > 0);
+
+                return `
+                    <div class="admin-header">
+                        <h1 style="font-size: 2.5rem; font-weight: 900; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 1rem; position: relative; z-index: 1;">
+                            <span aria-hidden="true">🛡️</span> Admin Dashboard
+                        </h1>
+                        <p style="opacity: 0.95; font-size: 1.125rem; position: relative; z-index: 1;">Manage submissions, claims, and approve items</p>
+                        
+                        <div class="admin-stats">
+                            <div class="stat-card">
+                                <span class="stat-number">${pendingItems.length}</span>
+                                <span class="stat-label">⏳ Pending Items</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-number">${approvedItems.length}</span>
+                                <span class="stat-label">✅ Approved Items</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-number">${itemsWithClaims.length}</span>
+                                <span class="stat-label">📧 Items with Claims</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${this.renderAdminAnalytics()}
+
+                    <!-- Data Management Section -->
+                    <div class="card" style="margin-bottom: 3rem;">
+                        <div class="card-body">
+                            <h2 style="font-size: 1.75rem; font-weight: 800; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                                💾 Data Management
+                            </h2>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                                <div style="background: linear-gradient(135deg, var(--primary-light) 0%, #93c5fd 100%); 
+                                    padding: 1.5rem; border-radius: 1rem; border: 2px solid var(--primary);">
+                                    <h3 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 0.75rem; color: #1e40af;">
+                                        📥 Export Data
+                                    </h3>
+                                    <p style="font-size: 0.875rem; color: #1e3a8a; margin-bottom: 1rem;">
+                                        Download all items and claims as a backup file. Keep your data safe!
+                                    </p>
+                                    <button class="btn btn-primary" onclick="app.exportData()" style="width: 100%;">
+                                        📥 Export All Data (JSON)
+                                    </button>
+                                </div>
+                                
+                                <div style="background: linear-gradient(135deg, var(--success-light) 0%, #6ee7b7 100%); 
+                                    padding: 1.5rem; border-radius: 1rem; border: 2px solid var(--success);">
+                                    <h3 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 0.75rem; color: #065f46;">
+                                        📤 Import Data
+                                    </h3>
+                                    <p style="font-size: 0.875rem; color: #064e3b; margin-bottom: 1rem;">
+                                        Restore data from a backup file. This will merge with existing data.
+                                    </p>
+                                    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="app.importData(event)">
+                                    <button class="btn btn-success" onclick="document.getElementById('importFile').click()" style="width: 100%;">
+                                        📤 Import Data from File
+                                    </button>
+                                </div>
+                                
+                                <div style="background: linear-gradient(135deg, var(--danger-light) 0%, #fca5a5 100%); 
+                                    padding: 1.5rem; border-radius: 1rem; border: 2px solid var(--danger);">
+                                    <h3 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 0.75rem; color: #991b1b;">
+                                        🔄 Reset System
+                                    </h3>
+                                    <p style="font-size: 0.875rem; color: #7f1d1d; margin-bottom: 1rem;">
+                                        Clear all data and start fresh. This action cannot be undone!
+                                    </p>
+                                    <button class="btn btn-danger" onclick="app.resetSystem()" style="width: 100%;">
+                                        🗑️ Reset All Data
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="info-banner" style="margin-top: 1.5rem;">
+                                <p style="font-size: 0.875rem; margin: 0;">
+                                    💡 <strong>Tip:</strong> Export your data regularly as a backup. If you switch browsers or clear cache, you can restore all your data using the import feature.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${this.renderActivityLog()}
+
+                    <!-- Pending Items Section -->
+                    <section style="margin-bottom: 3rem;" aria-labelledby="pendingItemsHeading">
+                        <h2 id="pendingItemsHeading" style="font-size: 1.75rem; font-weight: 800; margin-bottom: 1.5rem; color: var(--gray-900);">
+                            ⏳ Pending Items (${pendingItems.length})
+                        </h2>
+                        
+                        ${pendingItems.length === 0 ? `
+                            <div class="card empty-state">
+                                <div class="empty-icon" aria-hidden="true">✅</div>
+                                <p style="font-size: 1.125rem;">No pending items to review</p>
+                                <p style="font-size: 0.95rem; color: var(--gray-500); margin-top: 0.5rem;">All submissions have been processed!</p>
+                            </div>
+                        ` : `
+                            ${pendingItems.map(item => `
+                                <div class="admin-item-card">
+                                    <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+                                        <div style="flex: 1; min-width: 300px;">
+                                            <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 1rem; color: var(--gray-900);">
+                                                ${item.itemName}
+                                            </h3>
+                                            
+                                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.25rem; font-size: 0.95rem;">
+                                                <div>
+                                                    <p style="margin-bottom: 0.5rem;"><strong>📂 Category:</strong> ${item.category}</p>
+                                                    <p style="margin-bottom: 0.5rem;"><strong>📍 Location:</strong> ${item.location}</p>
+                                                    <p style="margin-bottom: 0.5rem;"><strong>📅 Date:</strong> ${item.date}</p>
+                                                </div>
+                                                <div>
+                                                    <p style="margin-bottom: 0.5rem;"><strong>👤 Found by:</strong> ${item.finderName}</p>
+                                                    <p style="margin-bottom: 0.5rem;"><strong>📧 Contact:</strong> ${item.finderContact}</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div style="background: var(--gray-50); padding: 1.25rem; border-radius: 0.75rem; margin-bottom: 1.25rem; border: 2px solid var(--gray-200);">
+                                                <p style="font-size: 0.95rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--gray-800);">📝 Description:</p>
+                                                <p style="color: var(--gray-700); line-height: 1.6;">${item.description}</p>
+                                            </div>
+                                            
+                                            ${item.image ? `
+                                                <img src="${item.image}" alt="Photo of ${item.itemName}" 
+                                                    style="max-width: 350px; width: 100%; border-radius: 0.75rem; box-shadow: var(--shadow-lg);">
+                                            ` : ''}
+                                        </div>
+                                        
+                                        <div style="display: flex; flex-direction: column; gap: 1rem; min-width: 180px;">
+                                            <button class="btn btn-success" onclick="app.approveItem(${item.id})" 
+                                                aria-label="Approve ${item.itemName}" style="justify-content: center;">
+                                                ✓ Approve
+                                            </button>
+                                            <button class="btn btn-danger" onclick="app.rejectItem(${item.id})" 
+                                                aria-label="Reject ${item.itemName}" style="justify-content: center;">
+                                                ✕ Reject
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        `}
+                    </section>
+
+                    <!-- Approved Items Section -->
+                    <section style="margin-bottom: 3rem;" aria-labelledby="approvedItemsHeading">
+                        <h2 id="approvedItemsHeading" style="font-size: 1.75rem; font-weight: 800; margin-bottom: 1.5rem; color: var(--gray-900);">
+                            ✅ Approved Items (${approvedItems.length})
+                        </h2>
+                        
+                        ${approvedItems.length === 0 ? `
+                            <div class="card empty-state">
+                                <div class="empty-icon" aria-hidden="true">📦</div>
+                                <p style="font-size: 1.125rem;">No approved items yet</p>
+                            </div>
+                        ` : `
+                            <div class="items-grid">
+                                ${approvedItems.map(item => `
+                                    <div class="admin-item-card" style="border-left-color: var(--success);">
+                                        <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.75rem;">${item.itemName}</h3>
+                                        <p style="color: var(--gray-600); margin-bottom: 0.75rem; font-size: 0.95rem;">
+                                            📍 ${item.location} • 📅 ${item.date}
+                                        </p>
+                                        <p style="color: var(--gray-600); margin-bottom: 1rem; font-size: 0.9rem;">
+                                            ${item.description.substring(0, 100)}${item.description.length > 100 ? '...' : ''}
+                                        </p>
+                                        ${item.claims && item.claims.length > 0 ? `
+                                            <div class="badge badge-warning" style="margin-bottom: 1rem;">
+                                                📧 ${item.claims.length} claim${item.claims.length > 1 ? 's' : ''}
+                                            </div>
+                                        ` : ''}
+                                        <button class="btn btn-danger btn-sm" onclick="app.deleteApprovedItem(${item.id})" 
+                                            aria-label="Delete ${item.itemName}" style="width: 100%; justify-content: center;">
+                                            🗑️ Delete Item
+                                        </button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `}
+                    </section>
+
+                    <!-- Claims Section -->
+                    <section aria-labelledby="claimsHeading">
+                        <h2 id="claimsHeading" style="font-size: 1.75rem; font-weight: 800; margin-bottom: 1.5rem; color: var(--gray-900);">
+                            📧 Items with Claims (${itemsWithClaims.length})
+                        </h2>
+                        
+                        ${itemsWithClaims.length === 0 ? `
+                            <div class="card empty-state">
+                                <div class="empty-icon" aria-hidden="true">✉️</div>
+                                <p style="font-size: 1.125rem;">No items with pending claims</p>
+                                <p style="font-size: 0.95rem; color: var(--gray-500); margin-top: 0.5rem;">Claims will appear here when students submit them</p>
+                            </div>
+                        ` : `
+                            ${itemsWithClaims.map(item => `
+                                <div class="admin-item-card" style="border-left-color: var(--purple);">
+                                    <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.75rem;">${item.itemName}</h3>
+                                    <p style="font-size: 0.95rem; color: var(--gray-600); margin-bottom: 1.5rem;">
+                                        📍 Found at <strong>${item.location}</strong> on <strong>${item.date}</strong>
+                                    </p>
+                                    
+                                    <div style="space-y: 1rem;">
+                                        ${item.claims.map(claim => `
+                                            <div class="claim-card" style="margin-bottom: 1rem;">
+                                                <div style="display: flex; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap;">
+                                                    <div style="flex: 1; min-width: 280px;">
+                                                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem; margin-bottom: 1rem; font-size: 0.9rem;">
+                                                            <p><strong>👤 Claimant:</strong> ${claim.claimerName}</p>
+                                                            <p><strong>🎓 Student ID:</strong> ${claim.studentId}</p>
+                                                            <p style="grid-column: 1 / -1;"><strong>📧 Email:</strong> ${claim.claimerEmail}</p>
+                                                        </div>
+                                                        
+                                                        <div style="background: white; padding: 1rem; border-radius: 0.75rem; margin-bottom: 0.75rem; border: 2px solid var(--primary-light);">
+                                                            <p style="font-size: 0.9rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--primary);">🔍 Verification Details:</p>
+                                                            <p style="font-size: 0.9rem; color: var(--gray-700); line-height: 1.6;">${claim.description}</p>
+                                                        </div>
+                                                        
+                                                        <div class="badge ${claim.status === 'approved' ? 'badge-success' : 'badge-warning'}">
+                                                            ${claim.status === 'approved' ? '✅' : '⏳'} Status: ${claim.status.toUpperCase()}
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    ${claim.status === 'pending' ? `
+                                                        <div style="display: flex; flex-direction: column; gap: 0.75rem; min-width: 160px;">
+                                                            <button class="btn btn-success btn-sm" onclick="app.approveClaim(${item.id}, ${claim.id})" 
+                                                                aria-label="Approve claim from ${claim.claimerName}" style="justify-content: center;">
+                                                                ✓ Approve & Delete Item
+                                                            </button>
+                                                            <button class="btn btn-danger btn-sm" onclick="app.rejectClaim(${item.id}, ${claim.id})" 
+                                                                aria-label="Reject claim from ${claim.claimerName}" style="justify-content: center;">
+                                                                ✕ Reject Claim
+                                                            </button>
+                                                        </div>
+                                                    ` : ''}
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        `}
+                    </section>
+
+                `;
+            },
+
+            attachAdminListeners() {
+                // Event listeners are inline in the HTML
+            },
+
+            approveItem(itemId) {
+                const item = this.items.find(i => i.id === itemId);
+                if (item) {
+                    item.status = 'approved';
+                    this.saveItems();
+                    this.addActivity('Item Approved', `"${item.itemName}" (${item.category}) - Now visible to students`);
+                    this.showToast('Item approved successfully', 'success');
+                    this.render();
+                }
+            },
+
+            rejectItem(itemId) {
+                const item = this.items.find(i => i.id === itemId);
+                if (!item) return;
+                
+                // Show custom confirmation modal
+                const message = `Item: ${item.itemName}\n\nThis action cannot be undone.`;
+                this.showConfirm('⚠️ Reject this item?', message, (confirmed) => {
+                    if (confirmed) {
+                        const itemName = item.itemName;
+                        this.items = this.items.filter(i => i.id !== itemId);
+                        this.saveItems();
+                        this.addActivity('Item Rejected', `"${itemName}" - Removed from system`);
+                        this.showToast(`❌ Rejected "${itemName}"`, 'success');
+                        this.render();
+                    }
+                });
+            },
+
+            deleteApprovedItem(itemId) {
+                const item = this.items.find(i => i.id === itemId);
+                
+                if (!item) {
+                    alert('Error: Item not found!');
+                    return;
+                }
+                
+                const hasClaims = item.claims && item.claims.length > 0;
+                
+                // Build confirmation message
+                let message = `Item: ${item.itemName}\n`;
+                if (hasClaims) {
+                    message += `\n⚠️ WARNING: This item has ${item.claims.length} claim(s)!\nDeleting will remove all claims too.\n`;
+                }
+                message += '\nThis action cannot be undone.';
+                
+                // Show custom confirmation modal
+                this.showConfirm('🗑️ Delete this item?', message, (confirmed) => {
+                    if (confirmed) {
+                        const itemName = item.itemName;
+                        const claimCount = item.claims ? item.claims.length : 0;
+                        this.items = this.items.filter(i => i.id !== itemId);
+                        this.saveItems();
+                        
+                        this.addActivity('Item Deleted', `"${itemName}" ${claimCount > 0 ? `with ${claimCount} claim(s)` : ''}`);
+                        
+                        if (hasClaims) {
+                            this.showToast(`🗑️ Deleted "${itemName}" and ${claimCount} claim(s)`, 'success');
+                        } else {
+                            this.showToast(`🗑️ Deleted "${itemName}"`, 'success');
+                        }
+                        
+                        this.render();
+                    }
+                });
+            },
+
+            approveClaim(itemId, claimId) {
+                const item = this.items.find(i => i.id === itemId);
+                if (!item) return;
+
+                const claim = item.claims.find(c => c.id === claimId);
+                if (!claim) return;
+
+                // Show custom confirmation modal
+                const message = `Claimant: ${claim.claimerName}\nEmail: ${claim.claimerEmail}\nItem: ${item.itemName}\n\nThis will:\n• Mark the claim as approved\n• Delete the item from the system\n• Item will no longer be visible to other students`;
+                
+                this.showConfirm('✅ Approve this claim?', message, (confirmed) => {
+                    if (confirmed) {
+                        // Update user's claim status
+                        const userClaim = this.userClaims.find(uc => uc.id === claimId);
+                        if (userClaim) {
+                            userClaim.status = 'Approved';
+                            this.saveUserClaims();
+                        }
+                        
+                        this.items = this.items.filter(i => i.id !== itemId);
+                        this.saveItems();
+                        this.addActivity('Claim Approved', `"${item.itemName}" claimed by ${claim.claimerName} (${claim.claimerEmail})`);
+                        this.showToast(`✅ Approved claim from ${claim.claimerName}`, 'success');
+                        
+                        // Show email notification preview
+                        this.showEmailPreview(item, claim);
+                        
+                        this.render();
+                    }
+                });
+            },
+
+            rejectClaim(itemId, claimId) {
+                const item = this.items.find(i => i.id === itemId);
+                if (!item) return;
+
+                const claim = item.claims.find(c => c.id === claimId);
+                if (!claim) return;
+
+                // Show custom confirmation modal
+                const message = `Claimant: ${claim.claimerName}\nItem: ${item.itemName}\n\nThis will remove their claim request.`;
+                
+                this.showConfirm('❌ Reject this claim?', message, (confirmed) => {
+                    if (confirmed) {
+                        // Update user's claim status
+                        const userClaim = this.userClaims.find(uc => uc.id === claimId);
+                        if (userClaim) {
+                            userClaim.status = 'Rejected';
+                            this.saveUserClaims();
+                        }
+                        
+                        item.claims = item.claims.filter(c => c.id !== claimId);
+                        this.saveItems();
+                        this.addActivity('Claim Rejected', `"${item.itemName}" claim from ${claim.claimerName} was rejected`);
+                        this.showToast(`❌ Rejected claim from ${claim.claimerName}`, 'success');
+                        this.render();
+                    }
+                });
+            }
+        };
+
+        // Initialize app when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+    </script>
+</body>
+</html>
